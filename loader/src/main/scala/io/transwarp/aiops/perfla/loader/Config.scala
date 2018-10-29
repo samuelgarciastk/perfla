@@ -1,4 +1,4 @@
-package io.transwarp.perfla.loader
+package io.transwarp.aiops.perfla.loader
 
 import org.slf4j.LoggerFactory
 import org.yaml.snakeyaml.Yaml

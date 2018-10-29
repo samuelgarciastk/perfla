@@ -1,4 +1,4 @@
-package io.transwarp.perfla.analyzer
+package io.transwarp.aiops.perfla.analyzer
 
 import java.io.File
 

@@ -1,7 +1,7 @@
-package io.transwarp.perfla.analyzer
+package io.transwarp.aiops.perfla.analyzer
 
-import io.transwarp.perfla.analyzer.TaskLevel.TaskLevel
-import io.transwarp.perfla.loader.{Config, Task}
+import io.transwarp.aiops.perfla.analyzer.TaskLevel.TaskLevel
+import io.transwarp.aiops.perfla.loader.{Config, Task}
 
 class TaskEntry(line: String) {
   var task: Task = _

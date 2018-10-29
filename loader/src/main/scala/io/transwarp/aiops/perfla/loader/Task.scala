@@ -1,4 +1,4 @@
-package io.transwarp.perfla.loader
+package io.transwarp.aiops.perfla.loader
 
 class Task(val taskIdentifier: TaskIdentifier, taskBean: TaskBean) {
   val id: String = taskBean.id

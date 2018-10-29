@@ -1,4 +1,4 @@
-package io.transwarp.perfla.loader
+package io.transwarp.aiops.perfla.loader
 
 class Setting(settingBean: SettingBean) {
   val prefix: String = settingBean.prefix

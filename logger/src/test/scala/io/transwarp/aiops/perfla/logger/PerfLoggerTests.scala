@@ -1,4 +1,4 @@
-package io.transwarp.perfla.logger
+package io.transwarp.aiops.perfla.logger
 
 import org.junit.jupiter.api.{BeforeEach, Test}
 

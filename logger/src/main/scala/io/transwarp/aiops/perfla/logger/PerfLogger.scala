@@ -1,6 +1,6 @@
-package io.transwarp.perfla.logger
+package io.transwarp.aiops.perfla.logger
 
-import io.transwarp.perfla.loader.{Config, Task, TaskIdentifier}
+import io.transwarp.aiops.perfla.loader.{Config, Task, TaskIdentifier}
 import org.slf4j.LoggerFactory
 
 class PerfLogger(clazz: Class[_] = classOf[PerfLogger]) {
@@ -12,6 +12,11 @@ class PerfLogger(clazz: Class[_] = classOf[PerfLogger]) {
     checkpoint(caller.getClassName, caller.getMethodName, null)
   }
 
+  def checkpoint(uuid: String): Checkpoint = {
+    val caller = (new Throwable).getStackTrace()(1)
+    checkpoint(caller.getClassName, caller.getMethodName, uuid)
+  }
+
   def checkpoint(className: String, methodName: String, uuid: String): Checkpoint = {
     val checkpoint = new Checkpoint
     val identifier = new TaskIdentifier(className, methodName)
@@ -21,11 +26,6 @@ class PerfLogger(clazz: Class[_] = classOf[PerfLogger]) {
       checkpoint.startTime = System.currentTimeMillis
     })
     checkpoint
-  }
-
-  def checkpoint(uuid: String): Checkpoint = {
-    val caller = (new Throwable).getStackTrace()(1)
-    checkpoint(caller.getClassName, caller.getMethodName, uuid)
   }
 
   def log(checkpoint: Checkpoint): Unit = {
