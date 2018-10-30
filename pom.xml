@@ -15,7 +15,7 @@
     </modules>
 
     <properties>
-        <scala.version>2.12.7</scala.version>
+        <scala.version>2.10.6</scala.version>
         <maven.compiler.source>1.8</maven.compiler.source>
         <maven.compiler.target>1.8</maven.compiler.target>
     </properties>
