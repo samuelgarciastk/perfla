@@ -37,9 +37,9 @@ class Threshold(taskType: Byte, warnFactor: Double, errorFactor: Double) {
   var warn: Double = _
   var error: Double = _
 
-  init
+  init()
 
-  private def init: Unit = {
+  private def init(): Unit = {
     warn = threshold(warnFactor)
     error = threshold(errorFactor)
   }
