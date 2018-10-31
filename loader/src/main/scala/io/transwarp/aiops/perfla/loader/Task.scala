@@ -1,8 +1,8 @@
 package io.transwarp.aiops.perfla.loader
 
 class Task(val taskIdentifier: TaskIdentifier, taskBean: TaskBean) {
-  val id: String = taskBean.id
-  val pattern: String = taskBean.pattern
+  val id: String = Option(taskBean.id).getOrElse("no-id")
+  val pattern: String = Option(taskBean.pattern).getOrElse(throw new IllegalArgumentException("PerfLA-loader: Undefined task pattern."))
   /*
   0000|Mem|CPU|IO Read|IO Write
    */
@@ -16,12 +16,14 @@ class Task(val taskIdentifier: TaskIdentifier, taskBean: TaskBean) {
         case "Mem" => b |= 1 << 3
       }
       b.toByte
-    } else throw new IllegalArgumentException("Task type undefined!")
+    } else throw new IllegalArgumentException("PerfLA-loader: Undefined task type.")
   }
-  val threshold: Threshold = new Threshold(taskType, taskBean.warn_factor, taskBean.error_factor)
+  val threshold: Threshold = new Threshold(taskType, Option(taskBean.warn_factor).getOrElse(1D), Option(taskBean.error_factor).getOrElse(2D))
 }
 
 class TaskIdentifier(val className: String, val methodName: String) {
+  if (className == null || methodName == null) throw new IllegalArgumentException("PerfLA-loader: Null value in task identifier.")
+
   override def equals(obj: Any): Boolean = obj match {
     case o: TaskIdentifier =>
       o.className == this.className && o.methodName == this.methodName
