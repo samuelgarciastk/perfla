@@ -9,17 +9,23 @@ class ConfigBean {
 
 class SettingBean {
   @BeanProperty var prefix: String = _
-  @BeanProperty var io_read: Double = _
-  @BeanProperty var io_write: Double = _
-  @BeanProperty var cpu: Double = _
+  @BeanProperty var io_read: Double = -1
+  @BeanProperty var io_write: Double = -1
+  @BeanProperty var cpu: Double = -1
 }
 
 class TaskBean {
   @BeanProperty var id: String = _
-  @BeanProperty var class_name: String = _
-  @BeanProperty var method_name: String = _
+  @BeanProperty var clazz: String = _
+  @BeanProperty var method: String = _
   @BeanProperty var pattern: String = _
-  @BeanProperty var task_type: Array[String] = _
-  @BeanProperty var warn_factor: Double = _
-  @BeanProperty var error_factor: Double = _
+  @BeanProperty var mode: String = _
+  @BeanProperty var threshold: Array[ThresholdBean] = _
+}
+
+class ThresholdBean {
+  @BeanProperty var typ: String = _
+  @BeanProperty var percent: Double = -1
+  @BeanProperty var warn: Double = -1
+  @BeanProperty var error: Double = -1
 }

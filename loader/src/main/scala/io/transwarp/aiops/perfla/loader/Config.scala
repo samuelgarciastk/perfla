@@ -45,21 +45,27 @@ object Config {
       val configInput = new FileInputStream(configPath)
       try {
         val config = yaml.load(configInput).asInstanceOf[ConfigBean]
-        setting = new Setting(config.settings)
+
+        val newSetting = new Setting
+        newSetting.init(config.settings)
+        setting = newSetting
 
         val tasks = config.tasks
-        val newIdentifierMap = new mutable.HashMap[TaskIdentifier, Task]()
-        val newPatternMap = new mutable.HashMap[String, Task]()
-        tasks.foreach(f => {
-          val identifier = new TaskIdentifier(f.class_name, f.method_name)
-          val task = new Task(identifier, f)
-          newIdentifierMap += identifier -> task
-          newPatternMap += task.pattern -> task
-        })
-
-        identifierMap = newIdentifierMap
-        patternMap = newPatternMap
-        valid = true
+        if (tasks == null) valid = false
+        else {
+          val newIdentifierMap = new mutable.HashMap[TaskIdentifier, Task]()
+          val newPatternMap = new mutable.HashMap[String, Task]()
+          tasks.foreach(taskBean => {
+            val identifier = new TaskIdentifier(taskBean.clazz, taskBean.method)
+            val task = new Task
+            task.init(identifier, taskBean)
+            newIdentifierMap += identifier -> task
+            newPatternMap += task.pattern -> task
+          })
+          identifierMap = newIdentifierMap
+          patternMap = newPatternMap
+          valid = true
+        }
       } catch {
         case e: Exception =>
           valid = false

@@ -9,7 +9,6 @@ class PerfLoggerTests {
   @BeforeEach
   def init(): Unit = {
     PLOG = PerfLogger.getLogger
-    PLOG.setMod(PerfLogMod.DEFAULT)
   }
 
   @Test

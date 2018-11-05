@@ -41,7 +41,7 @@ object Analyzer {
 
 class Analyzer(files: Array[File]) {
   type patternMap = mutable.HashMap[String, ArrayBuffer[TaskEntry]]
-  private val uuidMap = new mutable.HashMap[String, patternMap]
+  private val idMap = new mutable.HashMap[String, patternMap]
   private val statisticsMap = new mutable.HashMap[String, mutable.HashMap[String, TaskStatistics]]
 
   def work(): Unit = files.foreach(file => {
@@ -49,10 +49,10 @@ class Analyzer(files: Array[File]) {
     val lines = source.getLines
     lines.foreach(line => if (line.indexOf(Config.setting.prefix) != -1) {
       val taskEntry = new TaskEntry(line)
-      if (uuidMap.contains(taskEntry.uuid)) {
+      if (idMap.contains(taskEntry.id)) {
         if (taskEntry.task != null) {
-          val patternMap = uuidMap(taskEntry.uuid)
-          val patternStatistics = statisticsMap(taskEntry.uuid)
+          val patternMap = idMap(taskEntry.id)
+          val patternStatistics = statisticsMap(taskEntry.id)
 
           if (patternMap.contains(taskEntry.task.pattern)) {
             val list = patternMap(taskEntry.task.pattern)
@@ -74,18 +74,18 @@ class Analyzer(files: Array[File]) {
         list += taskEntry
         val patternMap = new mutable.HashMap[String, ArrayBuffer[TaskEntry]]
         patternMap += taskEntry.task.pattern -> list
-        uuidMap += taskEntry.uuid -> patternMap
+        idMap += taskEntry.id -> patternMap
 
         val patternStatistics = new mutable.HashMap[String, TaskStatistics]
         patternStatistics += taskEntry.task.pattern -> TaskStatistics(taskEntry.diff, taskEntry.dataSize)
-        statisticsMap += taskEntry.uuid -> patternStatistics
+        statisticsMap += taskEntry.id -> patternStatistics
       }
     })
     source.close
   })
 
   def print(): Unit = {
-    uuidMap.foreach { case (uuid, patternMap) =>
+    idMap.foreach { case (uuid, patternMap) =>
       println(s"=====$uuid=====")
       patternMap.foreach { case (pattern, taskEntries) =>
         println(s"$pattern:")

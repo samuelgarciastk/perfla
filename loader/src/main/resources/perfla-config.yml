@@ -3,116 +3,102 @@ settings:
   prefix: '[PerfLog]'
   # MB/s
   io_read: 300
-  # MB/s
   io_write: 10
   # GHz
   cpu: 2.5
 tasks:
-# load
-- id: l1
-  class_name: 'io.transwarp.holodesk.storage.ds.column.block.RowBlockDS'
-  method_name: 'load'
-  pattern: 'RowBlockDS load'
-  task_type: ['IO_R']
-  warn_factor: 1
-  error_factor: 2
-- id: l2
-  class_name: 'io.transwarp.holodesk.storage.ds.column.block.RowBlockDS'
-  method_name: 'loadFilterBuffer'
-  pattern: 'RowBlockDS loadFilterBuffer'
-  task_type: ['CPU']
-  warn_factor: 1
-  error_factor: 10
-- id: l3
-  class_name: 'io.transwarp.holodesk.storage.ds.column.block.RowBlockDS'
-  method_name: 'blockIsPassedByFilter'
-  pattern: 'RowBlockDS blockIsPassedByFilter'
-  task_type: ['CPU']
-  warn_factor: 1
-  error_factor: 10
-- id: l4
-  class_name: 'io.transwarp.holodesk.storage.ds.column.block.RowBlockDS'
-  method_name: 'loadColumnBlocks'
-  pattern: 'RowBlockDS loadColumnBlocks'
-  task_type: ['IO_R']
-  warn_factor: 1
-  error_factor: 10
-- id: l5
-  class_name: 'io.transwarp.holodesk.storage.ds.column.block.ColumnBlockDS'
-  method_name: 'loadRowsIndex'
-  pattern: 'ColumnBlockDS loadRowsIndex'
-  task_type: ['CPU']
-  warn_factor: 1
-  error_factor: 10
-- id: l6
-  class_name: 'io.transwarp.holodesk.storage.ds.column.block.RadixTrieColumnBlockDS'
-  method_name: 'decodeV0DataColumn'
-  pattern: 'RadixTrieColumnBlockDS decodeV0DataColumn'
-  task_type: ['IO_R']
-  warn_factor: 1
-  error_factor: 10
-- id: l7
-  class_name: 'io.transwarp.holodesk.storage.ds.column.block.RadixTrieColumnBlockDS'
-  method_name: 'get'
-  pattern: 'RadixTrieColumnBlockDS get'
-  task_type: ['IO_R']
-  warn_factor: 1
-  error_factor: 10
-- id: l8
-  class_name: 'io.transwarp.holodesk.storage.ds.column.block.RadixTrieColumnBlockDS'
-  method_name: 'getBatch'
-  pattern: 'RadixTrieColumnBlockDS getBatch'
-  task_type: ['IO_R']
-  warn_factor: 1
-  error_factor: 10
-- id: l9
-  class_name: 'io.transwarp.holodesk.storage.ds.column.block.HashDictionaryColumnBlockDS'
-  method_name: 'decodeV0DataColumn'
-  pattern: 'HashDictionaryColumnBlockDS decodeV0DataColumn'
-  task_type: ['IO_R']
-  warn_factor: 1
-  error_factor: 10
-- id: l10
-  class_name: 'io.transwarp.holodesk.storage.ds.column.block.HashDictionaryColumnBlockDS'
-  method_name: 'get'
-  pattern: 'HashDictionaryColumnBlockDS get'
-  task_type: ['IO_R']
-  warn_factor: 1
-  error_factor: 10
-- id: l11
-  class_name: 'io.transwarp.holodesk.storage.ds.column.block.HashDictionaryColumnBlockDS'
-  method_name: 'getBatch'
-  pattern: 'HashDictionaryColumnBlockDS getBatch'
-  task_type: ['IO_R']
-  warn_factor: 1
-  error_factor: 10
-
-# put
-# - id: p1
-#   class_name: 'io.transwarp.holodesk.storage.ds.segment.Segment'
-#   method_name: 'init'
-#   pattern: 'Segment init'
-#   task_type: ['IO_W']
-#   warn_factor: 1
-#   error_factor: 2
-# - id: p2
-#   class_name: 'io.transwarp.holodesk.storage.ds.segment.WritableAppendOnlySegment'
-#   method_name: 'close'
-#   pattern: 'Segment close'
-#   task_type: ['IO_W']
-#   warn_factor: 1
-#   error_factor: 2
-# - id: p3
-#   class_name: 'io.transwarp.holodesk.storage.ds.column.block.RowBlockDS'
-#   method_name: 'spill'
-#   pattern: 'RowBlock spill'
-#   task_type: ['IO_W']
-#   warn_factor: 1
-#   error_factor: 2
-# - id: p4
-#   class_name: 'io.transwarp.holodesk.storage.ds.column.block.RowBlockDS'
-#   method_name: 'spillMetaData'
-#   pattern: 'RowBlock spillMetaData'
-#   task_type: ['IO_W']
-#   warn_factor: 1
-#   error_factor: 2
+  # load
+  - id: l1
+    clazz: 'io.transwarp.holodesk.storage.ds.column.block.RowBlockDS'
+    method: 'loadFilterBuffer'
+    pattern: 'RowBlockDS loadFilterBuffer'
+    mode: 'DEFAULT'
+    threshold:
+      - &IOR
+        typ: 'IO_R'
+        percent: 1
+        warn: 500
+        error: 1000
+  - id: l2
+    clazz: 'io.transwarp.holodesk.storage.ds.column.block.RowBlockDS'
+    method: 'blockIsPassedByFilter'
+    pattern: 'RowBlockDS blockIsPassedByFilter'
+    mode: 'MUTE'
+    threshold:
+      - &CPU
+        typ: 'CPU'
+        percent: 1
+        warn: 5
+        error: 10
+  - id: l3
+    clazz: 'io.transwarp.holodesk.storage.ds.column.block.RowBlockDS'
+    method: 'loadColumnBlocks'
+    pattern: 'RowBlockDS loadColumnBlocks'
+    mode: 'MUTE'
+    threshold: [*CPU]
+  - id: l4
+    clazz: 'io.transwarp.holodesk.storage.ds.column.block.ColumnBlockDS'
+    method: 'loadRowsIndex'
+    pattern: 'ColumnBlockDS loadRowsIndex'
+    mode: 'MUTE'
+    threshold: [*CPU]
+  - id: l5
+    clazz: 'io.transwarp.holodesk.storage.ds.column.block.RowBlockDSColumnIterator'
+    method: 'next'
+    pattern: 'RowBlockDSColumnIterator next'
+    mode: 'DEFAULT'
+    threshold: [*IOR]
+  - id: l6
+    clazz: 'io.transwarp.holodesk.storage.ds.column.block.RowBlockDS'
+    method: 'getBlockBitSet'
+    pattern: 'RowBlockDS getBlockBitSet'
+    mode: 'DEFAULT'
+    threshold: [*IOR]
+  - id: l7
+    clazz: 'io.transwarp.holodesk.storage.ds.column.block.RowBlockDSStatisticsColumnIterator'
+    method: 'next'
+    pattern: 'RowBlockDSStatisticsColumnIterator next'
+    mode: 'DEFAULT'
+    threshold: [*IOR]
+  - id: l8
+    clazz: 'io.transwarp.holodesk.storage.ds.column.block.RowBlockDSIterator'
+    method: 'next'
+    pattern: 'RowBlockDSIterator next'
+    mode: 'DEFAULT'
+    threshold: [*IOR]
+  - id: l9
+    clazz: 'io.transwarp.holodesk.storage.ds.column.block.RowBlockDSStatisticsIterator'
+    method: 'next'
+    pattern: 'RowBlockDSStatisticsIterator next'
+    mode: 'DEFAULT'
+    threshold: [*IOR]
+  # put
+  - id: p1
+    clazz: 'io.transwarp.holodesk.storage.ds.segment.Segment'
+    method: 'init'
+    pattern: 'Segment init'
+    mode: 'DEFAULT'
+    threshold:
+      - &IOW
+        typ: 'IO_W'
+        percent: 1
+        warn: 5
+        error: 10
+  - id: p2
+    clazz: 'io.transwarp.holodesk.storage.ds.segment.WritableAppendOnlySegment'
+    method: 'close'
+    pattern: 'WritableAppendOnlySegment close'
+    mode: 'DEFAULT'
+    threshold: [*IOW]
+  - id: p3
+    clazz: 'io.transwarp.holodesk.storage.ds.column.block.RowBlockDS'
+    method: 'spill'
+    pattern: 'RowBlock spill'
+    mode: 'DEFAULT'
+    threshold: [*IOW]
+  - id: p4
+    clazz: 'io.transwarp.holodesk.storage.ds.column.block.RowBlockDS'
+    method: 'spillMetaData'
+    pattern: 'RowBlock spillMetaData'
+    mode: 'DEFAULT'
+    threshold: [*IOW]
