@@ -1,37 +1,14 @@
 package io.transwarp.aiops.perfla.logger
 
-import io.transwarp.aiops.perfla.loader.{Config, Task, TaskIdentifier}
+import io.transwarp.aiops.perfla.loader.TaskIdentifier
 
 class Checkpoint {
-  var id: String = _
-  var dataSize: Long = 1
-  private[logger] var startTime: Long = _
-  private[logger] var endTime: Long = _
-  private[logger] var interval: Long = _
-  private[logger] var task: Task = _
-  private var taskIdentifier: TaskIdentifier = _
-  private var valid = false
-
-  def isValid: Boolean = valid
-
-  def start: Checkpoint = {
-    valid = false
-    startTime = System.currentTimeMillis
-    this
-  }
-
-  def stop: Checkpoint = {
-    endTime = System.currentTimeMillis
-    interval = endTime - startTime
-    valid = true
-    this
-  }
-
-  def initTask: Task = {
-    if (taskIdentifier != null && Config.isValid)
-      task = Config.identifierMap.get(taskIdentifier).orNull
-    task
-  }
+  private[logger] var id: String = _
+  private[logger] var taskIdentifier: TaskIdentifier = _
+  private[logger] var dataSize: Long = 1L
+  private[logger] var startTime: Long = -1L
+  private[logger] var endTime: Long = -1L
+  private[logger] var interval: Long = -1L
 
   def setId(value: String): Checkpoint = {
     id = value
@@ -43,8 +20,21 @@ class Checkpoint {
     this
   }
 
-  def setDataSize(value: Long): Checkpoint = {
+  def setSize(value: Long): Checkpoint = {
     dataSize = value
     this
   }
+
+  def start: Checkpoint = {
+    startTime = System.currentTimeMillis
+    this
+  }
+
+  def stop: Checkpoint = {
+    endTime = System.currentTimeMillis
+    interval = endTime - startTime
+    this
+  }
+
+  def isValid: Boolean = interval != -1L
 }

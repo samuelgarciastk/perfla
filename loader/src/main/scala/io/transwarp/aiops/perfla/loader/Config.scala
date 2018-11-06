@@ -97,7 +97,7 @@ object Config {
         })
         if (!watchKey.reset) {
           stop = true
-          logger.warn("PerfLA-loader: Watch key has been unregistered!")
+          logger.warn("PerfLA-loader: Watch key has been unregistered.")
         }
       }
     }
