@@ -30,6 +30,7 @@ class Collector {
   def start: Collector = {
     currentTime = System.currentTimeMillis
     if (startTime == -1L) startTime = currentTime
+    currentSize = 0
     this
   }
 

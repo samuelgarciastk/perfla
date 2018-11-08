@@ -1,0 +1,6 @@
+[PerfLog] c1:m1 [ERROR] [qwer1234] [0~1000:1000] [0]
+[PerfLog] c2:m2 [ERROR] [qwer1234] [0~700:700] [0]
+[PerfLog] c5:m5 [ERROR] [qwer1234] [800~900:100] [0]
+[PerfLog] c3:m3 [ERROR] [qwer1234] [10~100:90] [0]
+[PerfLog] c4:m4 [ERROR] [qwer1234] [150~600:450] [0]
+[PerfLog] c6:m6 [ERROR] [qwer1234] [850~860:10] [0]

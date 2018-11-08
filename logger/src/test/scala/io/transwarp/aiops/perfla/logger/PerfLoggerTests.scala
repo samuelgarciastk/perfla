@@ -44,7 +44,7 @@ class PerfLoggerTests {
   }
 
   private def fakeMethod(): Unit = {
-    val checkpoint = PLOG.checkpoint(null)
+    val checkpoint = PLOG.checkpoint(null).start
     collector.start
     Thread.sleep(1000)
     checkpoint.setSize(100)

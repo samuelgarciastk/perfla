@@ -1,0 +1,54 @@
+---
+settings:
+  prefix: '[PerfLog]'
+  # MB/s
+  io_read: 300
+  io_write: 10
+  # GHz
+  cpu: 2.5
+
+tasks:
+  - id: t1
+    clazz: 'c1'
+    method: 'm1'
+    pattern: 'c1:m1'
+    mode: 'FORCE'
+    threshold:
+      - &IOR
+        typ: 'IO_R'
+        percent: 1
+        warn: 500
+        error: 1000
+    sub_tasks: [t2, t5]
+  - id: t2
+    clazz: 'c2'
+    method: 'm2'
+    pattern: 'c2:m2'
+    mode: 'FORCE'
+    threshold: [*IOR]
+    sub_tasks: [t3, t4]
+  - id: t3
+    clazz: 'c3'
+    method: 'm3'
+    pattern: 'c3:m3'
+    mode: 'FORCE'
+    threshold: [*IOR]
+  - id: t4
+    clazz: 'c4'
+    method: 'm4'
+    pattern: 'c4:m4'
+    mode: 'FORCE'
+    threshold: [*IOR]
+  - id: t5
+    clazz: 'c5'
+    method: 'm5'
+    pattern: 'c5:m5'
+    mode: 'FORCE'
+    threshold: [*IOR]
+    sub_tasks: [t6]
+  - id: t6
+    clazz: 'c6'
+    method: 'm6'
+    pattern: 'c6:m6'
+    mode: 'FORCE'
+    threshold: [*IOR]

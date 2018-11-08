@@ -8,6 +8,7 @@ class Task {
   var pattern: String = _
   var mode: LogMod = _
   var threshold: Threshold = _
+  var subTasks: Array[String] = _
 
   def init(taskIdentifier: TaskIdentifier, taskBean: TaskBean): Unit = {
     id = Option(taskBean.id).getOrElse(Task.default_id)
@@ -16,6 +17,7 @@ class Task {
     mode = LogMod.withNameWithDefault(taskBean.mode)
     threshold = new Threshold
     threshold.init(taskBean.threshold)
+    subTasks = taskBean.sub_tasks
   }
 }
 

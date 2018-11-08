@@ -21,6 +21,7 @@ class TaskBean {
   @BeanProperty var pattern: String = _
   @BeanProperty var mode: String = _
   @BeanProperty var threshold: Array[ThresholdBean] = _
+  @BeanProperty var sub_tasks: Array[String] = _
 }
 
 class ThresholdBean {
