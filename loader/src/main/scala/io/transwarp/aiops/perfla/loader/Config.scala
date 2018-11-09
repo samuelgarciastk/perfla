@@ -21,7 +21,6 @@ object Config {
   var setting: Setting = _
   var identifierMap: mutable.Map[TaskIdentifier, Task] = _
   var patternMap: mutable.Map[String, Task] = _
-  // var idMap: mutable.Map[String, Task] = _
   private var valid = false
 
   {
@@ -56,18 +55,15 @@ object Config {
         else {
           val newIdentifierMap = new mutable.HashMap[TaskIdentifier, Task]()
           val newPatternMap = new mutable.HashMap[String, Task]()
-          // val newIdMap = new mutable.HashMap[String, Task]()
           tasks.foreach(taskBean => {
             val identifier = new TaskIdentifier(taskBean.clazz, taskBean.method)
             val task = new Task
             task.init(identifier, taskBean)
             newIdentifierMap += identifier -> task
             newPatternMap += task.pattern -> task
-            // newIdMap += task.id -> task
           })
           identifierMap = newIdentifierMap
           patternMap = newPatternMap
-          // idMap = newIdMap
           valid = true
         }
       } catch {
