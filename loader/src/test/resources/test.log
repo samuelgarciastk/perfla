@@ -4,3 +4,5 @@
 [PerfLog] c3:m3 [ERROR] [qwer1234] [10~100:90] [0]
 [PerfLog] c4:m4 [ERROR] [qwer1234] [150~600:450] [0]
 [PerfLog] c6:m6 [ERROR] [qwer1234] [850~860:10] [0]
+[PerfLog] c7:m7 [ERROR] [qwer1234] [200~400:200] [0]
+[PerfLog] c8:m8 [ERROR] [qwer1234] [400~560:160] [0]

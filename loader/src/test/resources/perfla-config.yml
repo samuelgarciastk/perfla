@@ -39,6 +39,7 @@ tasks:
     pattern: 'c4:m4'
     mode: 'FORCE'
     threshold: [*IOR]
+    sub_tasks: [t7, t8]
   - id: t5
     clazz: 'c5'
     method: 'm5'
@@ -50,5 +51,17 @@ tasks:
     clazz: 'c6'
     method: 'm6'
     pattern: 'c6:m6'
+    mode: 'FORCE'
+    threshold: [*IOR]
+  - id: t7
+    clazz: 'c7'
+    method: 'm7'
+    pattern: 'c7:m7'
+    mode: 'FORCE'
+    threshold: [*IOR]
+  - id: t8
+    clazz: 'c8'
+    method: 'm8'
+    pattern: 'c8:m8'
     mode: 'FORCE'
     threshold: [*IOR]
