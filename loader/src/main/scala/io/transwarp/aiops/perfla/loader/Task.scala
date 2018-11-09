@@ -14,7 +14,7 @@ class Task {
     id = Option(taskBean.id).getOrElse(Task.default_id)
     identifier = taskIdentifier
     pattern = Option(taskBean.pattern).getOrElse(Task.defaultPattern(taskIdentifier))
-    mode = LogMod.withNameWithDefault(taskBean.mode)
+    mode = if (taskBean.mode == null) LogMod.DEFAULT else LogMod.withNameWithDefault(taskBean.mode)
     threshold = new Threshold
     threshold.init(taskBean.threshold)
     subTasks = taskBean.sub_tasks

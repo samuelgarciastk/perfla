@@ -12,7 +12,6 @@ tasks:
     clazz: 'c1'
     method: 'm1'
     pattern: 'c1:m1'
-    mode: 'FORCE'
     threshold:
       - &IOR
         typ: 'IO_R'
