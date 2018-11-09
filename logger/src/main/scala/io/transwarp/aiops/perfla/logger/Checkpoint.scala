@@ -5,7 +5,7 @@ import io.transwarp.aiops.perfla.loader.TaskIdentifier
 class Checkpoint {
   private[logger] var id: String = _
   private[logger] var taskIdentifier: TaskIdentifier = _
-  private[logger] var dataSize: Long = 1L
+  private[logger] var dataSize: Long = 0L
   private[logger] var startTime: Long = -1L
   private[logger] var endTime: Long = -1L
   private[logger] var interval: Long = -1L

@@ -8,116 +8,120 @@ settings:
   cpu: 2.5
 
 tasks:
-  # load
-  - id: l1
-    clazz: 'io.transwarp.holodesk.storage.ds.column.block.RowBlockDS'
-    method: 'loadFilterBuffer'
-    pattern: 'RowBlockDS loadFilterBuffer'
-    mode: 'MUTE'
+  # Default threshold
+  - clazz: 'threshold'
+    method: 'default'
     threshold:
       - &IOR
-        typ: 'IO_R'
+        typ: IO_R
         percent: 1
         warn: 500
         error: 1000
-  - id: l2
-    clazz: 'io.transwarp.holodesk.storage.ds.column.block.RowBlockDS'
-    method: 'blockIsPassedByFilter'
-    pattern: 'RowBlockDS blockIsPassedByFilter'
-    mode: 'MUTE'
-    threshold:
-      - &CPU
-        typ: 'CPU'
+      - &IOW
+        typ: IO_W
         percent: 1
         warn: 5
         error: 10
-  - id: l3
-    clazz: 'io.transwarp.holodesk.storage.ds.column.block.RowBlockDS'
-    method: 'loadColumnBlocks'
-    pattern: 'RowBlockDS loadColumnBlocks'
-    mode: 'MUTE'
-    threshold: [*CPU]
-  # - id: l4
-  #   clazz: 'io.transwarp.holodesk.storage.ds.column.block.ColumnBlockDS'
-  #   method: 'loadRowsIndex'
-  #   pattern: 'ColumnBlockDS loadRowsIndex'
-  #   mode: 'MUTE'
-  #   threshold: [*CPU]
-  - id: l6
-    clazz: 'io.transwarp.holodesk.storage.ds.column.block.RowBlockDS'
-    method: 'getBlockBitSet'
-    pattern: 'RowBlockDS getBlockBitSet'
-    mode: 'MUTE'
+      - &CPU
+        typ: CPU
+        percent: 1
+        warn: 5
+        error: 10
+
+  - id: si1
+    clazz: 'io.transwarp.holodesk.storage.ds.segment.Segment.InternalRowIterator'
+    method: 'iterator'
+    pattern: 'InternalRowIterator iterator'
+    mode: FORCE
     threshold: [*IOR]
+    sub_tasks: [rbi1, rbi2, rbi3, rbi4, rbi5]
 
   # RowBlock Iterator
   - id: rbi1
     clazz: 'io.transwarp.holodesk.storage.ds.column.block.RowBlockDSColumnIterator'
     method: 'iterator'
     pattern: 'RowBlockDSColumnIterator iterator'
-    mode: 'FORCE'
+    mode: FORCE
     threshold: [*IOR]
   - id: rbi2
     clazz: 'io.transwarp.holodesk.storage.ds.column.block.RowBlockDSStatisticsColumnIterator'
     method: 'iterator'
     pattern: 'RowBlockDSStatisticsColumnIterator iterator'
-    mode: 'FORCE'
+    mode: FORCE
     threshold: [*IOR]
   - id: rbi3
     clazz: 'io.transwarp.holodesk.storage.ds.column.block.RowBlockDSIterator'
     method: 'iterator'
     pattern: 'RowBlockDSIterator iterator'
-    mode: 'FORCE'
+    mode: FORCE
     threshold: [*IOR]
   - id: rbi4
     clazz: 'io.transwarp.holodesk.storage.ds.column.block.RowBlockDSStatisticsIterator'
     method: 'iterator'
     pattern: 'RowBlockDSStatisticsIterator iterator'
-    mode: 'FORCE'
+    mode: FORCE
     threshold: [*IOR]
   - id: rbi5
     clazz: 'io.transwarp.holodesk.storage.ds.column.block.RowBlockDSFilterIterator'
     method: 'iterator'
     pattern: 'RowBlockDSFilterIterator iterator'
-    mode: 'FORCE'
+    mode: FORCE
     threshold: [*IOR]
     sub_tasks: [rbi4]
 
-  - id: si1
-    clazz: 'io.transwarp.holodesk.storage.ds.segment.Segment.InternalRowIterator'
-    method: 'iterator'
-    pattern: 'InternalRowIterator iterator'
-    mode: 'FORCE'
+  - id: l1
+    clazz: 'io.transwarp.holodesk.storage.ds.column.block.RowBlockDS'
+    method: 'loadFilterBuffer'
+    pattern: 'RowBlockDS loadFilterBuffer'
+    mode: MUTE
     threshold: [*IOR]
-    sub_tasks: [rbi1, rbi2, rbi3, rbi4, rbi5]
+  - id: l2
+    clazz: 'io.transwarp.holodesk.storage.ds.column.block.RowBlockDS'
+    method: 'blockIsPassedByFilter'
+    pattern: 'RowBlockDS blockIsPassedByFilter'
+    mode: MUTE
+    threshold: [*CPU]
+  - id: l3
+    clazz: 'io.transwarp.holodesk.storage.ds.column.block.RowBlockDS'
+    method: 'loadColumnBlocks'
+    pattern: 'RowBlockDS loadColumnBlocks'
+    mode: MUTE
+    threshold: [*CPU]
+  # - id: l4
+  #   clazz: 'io.transwarp.holodesk.storage.ds.column.block.ColumnBlockDS'
+  #   method: 'loadRowsIndex'
+  #   pattern: 'ColumnBlockDS loadRowsIndex'
+  #   mode: MUTE
+  #   threshold: [*CPU]
+  - id: l6
+    clazz: 'io.transwarp.holodesk.storage.ds.column.block.RowBlockDS'
+    method: 'getBlockBitSet'
+    pattern: 'RowBlockDS getBlockBitSet'
+    mode: MUTE
+    threshold: [*IOR]
 
   # put
   - id: p1
     clazz: 'io.transwarp.holodesk.storage.ds.segment.Segment'
     method: 'init'
     pattern: 'Segment init'
-    mode: 'MUTE'
-    threshold:
-      - &IOW
-        typ: 'IO_W'
-        percent: 1
-        warn: 5
-        error: 10
+    mode: MUTE
+    threshold: [*IOW]
   - id: p2
     clazz: 'io.transwarp.holodesk.storage.ds.segment.WritableAppendOnlySegment'
     method: 'close'
     pattern: 'WritableAppendOnlySegment close'
-    mode: 'MUTE'
+    mode: MUTE
     threshold: [*IOW]
   - id: p3
     clazz: 'io.transwarp.holodesk.storage.ds.column.block.RowBlockDS'
     method: 'spill'
     pattern: 'RowBlock spill'
-    mode: 'MUTE'
+    mode: MUTE
     threshold: [*IOW]
   - id: p4
     clazz: 'io.transwarp.holodesk.storage.ds.column.block.RowBlockDS'
     method: 'spillMetaData'
     pattern: 'RowBlock spillMetaData'
-    mode: 'MUTE'
+    mode: MUTE
     threshold: [*IOW]

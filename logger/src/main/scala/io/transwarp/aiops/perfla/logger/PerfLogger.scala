@@ -37,15 +37,16 @@ class PerfLogger(clazz: Class[_] = classOf[PerfLogger]) {
   }
 
   private def defaultLog(checkpoint: Checkpoint, task: Task): Unit = {
+    val dataSize = if (checkpoint.dataSize == 0) 1L else checkpoint.dataSize
     checkpoint.interval match {
-      case i if i > task.threshold.error * checkpoint.dataSize =>
+      case i if i > task.threshold.error * dataSize =>
         logger.error(s"${Config.setting.prefix}" +
           s" ${task.pattern}" +
           s" [ERROR]" +
           s" [${checkpoint.id}]" +
           s" [${checkpoint.startTime}~${checkpoint.endTime}:${checkpoint.interval}]" +
           s" [${checkpoint.dataSize}]")
-      case i if i > task.threshold.warn * checkpoint.dataSize =>
+      case i if i > task.threshold.warn * dataSize =>
         logger.warn(s"${Config.setting.prefix}" +
           s" ${task.pattern}" +
           s" [WARN]" +
@@ -65,12 +66,6 @@ class PerfLogger(clazz: Class[_] = classOf[PerfLogger]) {
       s" [${checkpoint.dataSize}]")
   }
 
-  private def getTask(taskIdentifier: TaskIdentifier): Task = {
-    if (taskIdentifier != null && Config.isValid) {
-      Config.identifierMap.get(taskIdentifier).orNull
-    } else null
-  }
-
   def log(collector: Collector): Unit = log(collector, null)
 
   def log(collector: Collector, logMod: LogMod): Unit = if (Config.isValid && collector.isValid) {
@@ -87,16 +82,23 @@ class PerfLogger(clazz: Class[_] = classOf[PerfLogger]) {
     }
   }
 
+  private def getTask(taskIdentifier: TaskIdentifier): Task = {
+    if (taskIdentifier != null && Config.isValid) {
+      Config.identifierMap.get(taskIdentifier).orNull
+    } else null
+  }
+
   private def defaultLog(collector: Collector, task: Task): Unit = {
+    val dataSize = if (collector.dataSize == 0) 1L else collector.dataSize
     collector.totalTime match {
-      case t if t > task.threshold.error * collector.dataSize =>
+      case t if t > task.threshold.error * dataSize =>
         logger.error(s"${Config.setting.prefix}" +
           s" ${task.pattern}" +
           s" [ERROR]" +
           s" [${collector.id}]" +
           s" [${collector.startTime}~${collector.endTime}:${collector.totalTime}]" +
           s" [${collector.dataSize}]")
-      case t if t > task.threshold.warn * collector.dataSize =>
+      case t if t > task.threshold.warn * dataSize =>
         logger.warn(s"${Config.setting.prefix}" +
           s" ${task.pattern}" +
           s" [WARN]" +
