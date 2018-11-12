@@ -9,34 +9,25 @@ class TaskEntry(line: String) {
   var id: String = _
   var startTime: Long = _
   var endTime: Long = _
-  var diff: Long = _
+  var totalTime: Long = _
   var dataSize: Long = _
+  var taskNum: Int = _
 
   init()
 
   private def init(): Unit = {
-    var startIdx = line.indexOf(Config.setting.prefix) + Config.setting.prefix.length + 1
-    var endIdx = line.indexOf('[', startIdx)
-    val pattern = line.substring(startIdx, endIdx - 1)
-    task = Config.patternMap.get(pattern).orNull
-    startIdx = endIdx + 1
-    endIdx = line.indexOf(']', startIdx)
-    level = TaskLevel.withNameWithDefault(line.substring(startIdx, endIdx))
-    startIdx = endIdx + 3
-    endIdx = line.indexOf(']', startIdx)
-    id = line.substring(startIdx, endIdx)
-    startIdx = endIdx + 3
-    endIdx = line.indexOf('~', startIdx)
-    startTime = line.substring(startIdx, endIdx).toLong
-    startIdx = endIdx + 1
-    endIdx = line.indexOf(':', startIdx)
-    endTime = line.substring(startIdx, endIdx).toLong
-    startIdx = endIdx + 1
-    endIdx = line.indexOf(']', startIdx)
-    diff = line.substring(startIdx, endIdx).toLong
-    startIdx = endIdx + 3
-    endIdx = line.indexOf(']', startIdx)
-    dataSize = line.substring(startIdx, endIdx).toLong
+    val startIndex = line.indexOf(Config.setting.prefix)
+    val elements = line.split("\\|", startIndex)
+    if (elements.length == 9) {
+      task = Config.patternMap.get(elements(1)).orNull
+      level = TaskLevel.withNameWithDefault(elements(2))
+      id = elements(3)
+      startTime = elements(4).toLong
+      endTime = elements(5).toLong
+      totalTime = elements(6).toLong
+      dataSize = elements(7).toLong
+      taskNum = elements(8).toInt
+    }
   }
 }
 

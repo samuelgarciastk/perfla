@@ -78,22 +78,22 @@ class Analyzer(files: Array[File]) {
             val idMap = sqlMap(taskEntry.id)
             if (idMap.contains(taskEntry.task.id)) {
               val taskNode = idMap(taskEntry.task.id)
-              taskNode.time += taskEntry.diff
+              taskNode.time += taskEntry.totalTime
               taskNode.size += taskEntry.dataSize
-              taskNode.num += 1
+              taskNode.num += taskEntry.taskNum
             } else {
               val taskNode = new TaskNode(taskEntry.task.id, taskEntry.task.pattern, taskEntry.task.subTasks)
-              taskNode.time += taskEntry.diff
+              taskNode.time += taskEntry.totalTime
               taskNode.size += taskEntry.dataSize
-              taskNode.num += 1
+              taskNode.num += taskEntry.taskNum
 
               idMap += taskEntry.task.id -> taskNode
             }
           } else {
             val taskNode = new TaskNode(taskEntry.task.id, taskEntry.task.pattern, taskEntry.task.subTasks)
-            taskNode.time += taskEntry.diff
+            taskNode.time += taskEntry.totalTime
             taskNode.size += taskEntry.dataSize
-            taskNode.num += 1
+            taskNode.num += taskEntry.taskNum
 
             val idMap = new mutable.HashMap[String, TaskNode]
             idMap += taskEntry.task.id -> taskNode

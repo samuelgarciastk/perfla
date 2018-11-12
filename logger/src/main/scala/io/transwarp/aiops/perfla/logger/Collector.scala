@@ -9,6 +9,7 @@ class Collector {
   private[logger] var totalTime = 0L
   private[logger] var startTime = -1L
   private[logger] var endTime = -1L
+  private[logger] var taskNum = 0
   private var currentTime: Long = _
   private var currentSize: Long = _
 
@@ -34,16 +35,15 @@ class Collector {
     this
   }
 
-  def stop: Collector = {
+  def stop: Collector = stop(true)
+
+  def stop(taskEnd: Boolean): Collector = {
     endTime = System.currentTimeMillis
     totalTime += endTime - currentTime
     dataSize += currentSize
+    if (taskEnd) taskNum += 1
     this
   }
 
   def isValid: Boolean = startTime != -1L && endTime != -1L
-
-  def getTotalTime: Long = totalTime
-
-  def getDataSize: Long = dataSize
 }

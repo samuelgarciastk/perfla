@@ -40,30 +40,39 @@ class PerfLogger(clazz: Class[_] = classOf[PerfLogger]) {
     val dataSize = if (checkpoint.dataSize == 0) 1L else checkpoint.dataSize
     checkpoint.interval match {
       case i if i > task.threshold.error * dataSize =>
-        logger.error(s"${Config.setting.prefix}" +
-          s" ${task.pattern}" +
-          s" [ERROR]" +
-          s" [${checkpoint.id}]" +
-          s" [${checkpoint.startTime}~${checkpoint.endTime}:${checkpoint.interval}]" +
-          s" [${checkpoint.dataSize}]")
+        logger.error(logFormat(
+          task.pattern,
+          "ERROR",
+          checkpoint.id,
+          checkpoint.startTime,
+          checkpoint.endTime,
+          checkpoint.interval,
+          checkpoint.dataSize,
+          1))
       case i if i > task.threshold.warn * dataSize =>
-        logger.warn(s"${Config.setting.prefix}" +
-          s" ${task.pattern}" +
-          s" [WARN]" +
-          s" [${checkpoint.id}]" +
-          s" [${checkpoint.startTime}~${checkpoint.endTime}:${checkpoint.interval}]" +
-          s" [${checkpoint.dataSize}]")
+        logger.warn(logFormat(
+          task.pattern,
+          "WARN",
+          checkpoint.id,
+          checkpoint.startTime,
+          checkpoint.endTime,
+          checkpoint.interval,
+          checkpoint.dataSize,
+          1))
       case _ =>
     }
   }
 
   private def forceLog(checkpoint: Checkpoint, task: Task): Unit = {
-    logger.info(s"${Config.setting.prefix}" +
-      s" ${if (task == null) "Unknown Task" else task.pattern}" +
-      s" [INFO]" +
-      s" [${checkpoint.id}]" +
-      s" [${checkpoint.startTime}~${checkpoint.endTime}:${checkpoint.interval}]" +
-      s" [${checkpoint.dataSize}]")
+    logger.info(logFormat(
+      if (task == null) "Unknown Task" else task.pattern,
+      "INFO",
+      checkpoint.id,
+      checkpoint.startTime,
+      checkpoint.endTime,
+      checkpoint.interval,
+      checkpoint.dataSize,
+      1))
   }
 
   def log(collector: Collector): Unit = log(collector, null)
@@ -92,30 +101,50 @@ class PerfLogger(clazz: Class[_] = classOf[PerfLogger]) {
     val dataSize = if (collector.dataSize == 0) 1L else collector.dataSize
     collector.totalTime match {
       case t if t > task.threshold.error * dataSize =>
-        logger.error(s"${Config.setting.prefix}" +
-          s" ${task.pattern}" +
-          s" [ERROR]" +
-          s" [${collector.id}]" +
-          s" [${collector.startTime}~${collector.endTime}:${collector.totalTime}]" +
-          s" [${collector.dataSize}]")
+        logger.error(logFormat(
+          task.pattern,
+          "ERROR",
+          collector.id,
+          collector.startTime,
+          collector.endTime,
+          collector.totalTime,
+          collector.dataSize,
+          collector.taskNum))
       case t if t > task.threshold.warn * dataSize =>
-        logger.warn(s"${Config.setting.prefix}" +
-          s" ${task.pattern}" +
-          s" [WARN]" +
-          s" [${collector.id}]" +
-          s" [${collector.startTime}~${collector.endTime}:${collector.totalTime}]" +
-          s" [${collector.dataSize}]")
+        logger.warn(logFormat(
+          task.pattern,
+          "WARN",
+          collector.id,
+          collector.startTime,
+          collector.endTime,
+          collector.totalTime,
+          collector.dataSize,
+          collector.taskNum))
       case _ =>
     }
   }
 
+  private def logFormat(pattern: String,
+                        level: String,
+                        id: String,
+                        startTime: Long,
+                        endTime: Long,
+                        totalTime: Long,
+                        dataSize: Long,
+                        taskNum: Int): String =
+    s"${Config.setting.prefix}|$pattern|$level|$id|$startTime|$endTime|$totalTime|$dataSize|$taskNum"
+
   private def forceLog(collector: Collector, task: Task): Unit = {
-    logger.info(s"${Config.setting.prefix}" +
-      s" ${if (task == null) "Unknown Task" else task.pattern}" +
-      s" [INFO]" +
-      s" [${collector.id}]" +
-      s" [${collector.startTime}~${collector.endTime}:${collector.totalTime}]" +
-      s" [${collector.dataSize}]")
+    logger.info(logFormat(
+      if (task == null) "Unknown Task" else task.pattern,
+      "INFO",
+      collector.id,
+      collector.startTime,
+      collector.endTime,
+      collector.totalTime,
+      collector.dataSize,
+      collector.taskNum
+    ))
   }
 }
 
