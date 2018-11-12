@@ -10,7 +10,8 @@ class TaskNode(id: String, pattern: String, val subTasksId: Array[String]) {
   var flag = true
 
   def print(prefix: String): Unit = {
-    println(s"$prefix$pattern: ${Analyzer.formatTime(time)}, ${Analyzer.formatByte(size)} Byte, $num tasks")
+    if (size == 0) println(s"$prefix$pattern: ${Analyzer.formatTime(time)}, $num tasks")
+    else println(s"$prefix$pattern: ${Analyzer.formatTime(time)}, ${Analyzer.formatByte(size)} Byte, $num tasks")
     val basePrefix = if (prefix == "") "" else prefix.substring(0, prefix.length - 3) + "|  "
     val taskPrefix = basePrefix + "+- "
     val lastPrefix = basePrefix + "\\- "

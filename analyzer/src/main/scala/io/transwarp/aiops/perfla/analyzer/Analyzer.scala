@@ -66,39 +66,43 @@ class Analyzer(files: Array[File]) {
   type idMap = mutable.HashMap[String, TaskNode]
   private val sqlMap = new mutable.HashMap[String, idMap]
 
-  def work(): Unit = files.foreach(file => {
-    val source = Source.fromFile(file)
-    val lines = source.getLines
+  def work(): Unit = {
+    files.foreach(file => {
+      val source = Source.fromFile(file)
+      val lines = source.getLines
 
-    lines.foreach(line => if (line.indexOf(Config.setting.prefix) != -1) {
-      val taskEntry = new TaskEntry(line)
-      if (taskEntry.task != null) {
-        if (sqlMap.contains(taskEntry.id)) {
-          val idMap = sqlMap(taskEntry.id)
-          if (idMap.contains(taskEntry.task.id)) {
-            val taskNode = idMap(taskEntry.task.id)
-            taskNode.time += taskEntry.diff
-            taskNode.size += taskEntry.dataSize
-            taskNode.num += 1
+      lines.foreach(line => if (line.indexOf(Config.setting.prefix) != -1) {
+        val taskEntry = new TaskEntry(line)
+        if (taskEntry.task != null) {
+          if (sqlMap.contains(taskEntry.id)) {
+            val idMap = sqlMap(taskEntry.id)
+            if (idMap.contains(taskEntry.task.id)) {
+              val taskNode = idMap(taskEntry.task.id)
+              taskNode.time += taskEntry.diff
+              taskNode.size += taskEntry.dataSize
+              taskNode.num += 1
+            } else {
+              val taskNode = new TaskNode(taskEntry.task.id, taskEntry.task.pattern, taskEntry.task.subTasks)
+              taskNode.time += taskEntry.diff
+              taskNode.size += taskEntry.dataSize
+              taskNode.num += 1
+
+              idMap += taskEntry.task.id -> taskNode
+            }
           } else {
             val taskNode = new TaskNode(taskEntry.task.id, taskEntry.task.pattern, taskEntry.task.subTasks)
             taskNode.time += taskEntry.diff
             taskNode.size += taskEntry.dataSize
             taskNode.num += 1
 
+            val idMap = new mutable.HashMap[String, TaskNode]
             idMap += taskEntry.task.id -> taskNode
+            sqlMap += taskEntry.id -> idMap
           }
-        } else {
-          val taskNode = new TaskNode(taskEntry.task.id, taskEntry.task.pattern, taskEntry.task.subTasks)
-          taskNode.time += taskEntry.diff
-          taskNode.size += taskEntry.dataSize
-          taskNode.num += 1
-
-          val idMap = new mutable.HashMap[String, TaskNode]
-          idMap += taskEntry.task.id -> taskNode
-          sqlMap += taskEntry.id -> idMap
         }
-      }
+      })
+
+      source.close
     })
 
     sqlMap.foreach { case (sql, idMap) =>
@@ -114,9 +118,7 @@ class Analyzer(files: Array[File]) {
       }
       sqlMap += sql -> idMap.filter(_._2.flag)
     }
-
-    source.close
-  })
+  }
 
   def print(): Unit = {
     sqlMap.foreach { case (sql, idMap) =>

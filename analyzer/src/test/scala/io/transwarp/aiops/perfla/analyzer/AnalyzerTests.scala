@@ -5,6 +5,7 @@ import org.junit.jupiter.api.Test
 class AnalyzerTests {
   @Test
   def analyze(): Unit = {
-    Analyzer.main(Array("/home/stk/Projects/PerfLA/loader/src/test/resources/test.log"))
+    // Analyzer.main(Array("/home/stk/Projects/PerfLA/loader/src/test/resources/test.log"))
+    Analyzer.main(Array("/home/stk/Downloads/log"))
   }
 }
