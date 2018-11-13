@@ -63,8 +63,7 @@ object Analyzer {
 }
 
 class Analyzer(files: Array[File]) {
-  type idMap = mutable.HashMap[String, TaskNode]
-  private val sqlMap = new mutable.HashMap[String, idMap]
+  private val sqlMap = new mutable.HashMap[String, SQLInfo]
 
   def work(): Unit = {
     files.foreach(file => {
@@ -75,9 +74,11 @@ class Analyzer(files: Array[File]) {
         val taskEntry = new TaskEntry(line)
         if (taskEntry.task != null) {
           if (sqlMap.contains(taskEntry.id)) {
-            val idMap = sqlMap(taskEntry.id)
-            if (idMap.contains(taskEntry.task.id)) {
-              val taskNode = idMap(taskEntry.task.id)
+            val sqlInfo = sqlMap(taskEntry.id)
+            sqlInfo.logNum += 1
+
+            if (sqlInfo.idMap.contains(taskEntry.task.id)) {
+              val taskNode = sqlInfo.idMap(taskEntry.task.id)
               taskNode.time += taskEntry.totalTime
               taskNode.size += taskEntry.dataSize
               taskNode.num += taskEntry.taskNum
@@ -87,7 +88,7 @@ class Analyzer(files: Array[File]) {
               taskNode.size += taskEntry.dataSize
               taskNode.num += taskEntry.taskNum
 
-              idMap += taskEntry.task.id -> taskNode
+              sqlInfo.idMap += taskEntry.task.id -> taskNode
             }
           } else {
             val taskNode = new TaskNode(taskEntry.task.id, taskEntry.task.pattern, taskEntry.task.subTasks)
@@ -97,7 +98,7 @@ class Analyzer(files: Array[File]) {
 
             val idMap = new mutable.HashMap[String, TaskNode]
             idMap += taskEntry.task.id -> taskNode
-            sqlMap += taskEntry.id -> idMap
+            sqlMap += taskEntry.id -> SQLInfo(idMap, 1)
           }
         }
       })
@@ -105,26 +106,29 @@ class Analyzer(files: Array[File]) {
       source.close
     })
 
-    sqlMap.foreach { case (sql, idMap) =>
-      idMap.foreach { case (_, taskNode) =>
+    sqlMap.foreach { case (_, sqlInfo) =>
+      sqlInfo.idMap.foreach { case (_, taskNode) =>
         if (taskNode.subTasksId != null) {
           taskNode.subTasksId.foreach(id => {
-            idMap.get(id).foreach(subTaskNode => {
+            sqlInfo.idMap.get(id).foreach(subTaskNode => {
               taskNode.subTasks += subTaskNode
               subTaskNode.flag = false
             })
           })
         }
       }
-      sqlMap += sql -> idMap.filter(_._2.flag)
+      sqlInfo.idMap = sqlInfo.idMap.filter(_._2.flag)
     }
   }
 
   def print(): Unit = {
-    sqlMap.foreach { case (sql, idMap) =>
+    sqlMap.foreach { case (sql, sqlInfo) =>
       val delimiter = '+' + (-1 to sql.length).map(_ => '-').mkString + '+'
       println(s"\n$delimiter\n| $sql |\n$delimiter\n")
-      idMap.foreach(_._2.print(""))
+      sqlInfo.idMap.foreach(_._2.print(""))
+      println(s"\nTotal logging statements: ${sqlInfo.logNum}")
     }
   }
 }
+
+case class SQLInfo(var idMap: mutable.HashMap[String, TaskNode], var logNum: Int)
