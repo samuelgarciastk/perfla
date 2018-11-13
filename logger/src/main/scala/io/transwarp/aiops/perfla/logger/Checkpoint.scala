@@ -20,21 +20,38 @@ class Checkpoint {
     this
   }
 
+  /**
+    * Set data size.
+    * @param value data size
+    * @return
+    */
   def setSize(value: Long): Checkpoint = {
     dataSize = value
     this
   }
 
+  /**
+    * Start timer.
+    * @return
+    */
   def start: Checkpoint = {
     startTime = System.currentTimeMillis
     this
   }
 
+  /**
+    * Stop timer.
+    * @return
+    */
   def stop: Checkpoint = {
     endTime = System.currentTimeMillis
     interval = endTime - startTime
     this
   }
 
+  /**
+    * Check whether this checkpoint is ready to be record.
+    * @return
+    */
   def isValid: Boolean = interval != -1L
 }

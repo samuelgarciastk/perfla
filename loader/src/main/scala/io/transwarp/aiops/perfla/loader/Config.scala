@@ -21,27 +21,16 @@ object Config {
   var setting: Setting = _
   var identifierMap: mutable.Map[TaskIdentifier, Task] = _
   var patternMap: mutable.Map[String, Task] = _
+  private var hasDaemon = false
   private var valid = false
 
-  {
-    logger.info(s"PerfLA-loader: Config path [$configPath].")
-    load()
-    startWatchDaemon()
-  }
+  load()
 
   def isValid: Boolean = valid
 
-  def startWatchDaemon(): Unit = {
-    daemon.reset()
-    val t = new Thread(daemon)
-    t.setDaemon(true)
-    t.start()
-  }
-
-  def stopWatchDaemon(): Unit = daemon.terminate()
-
   private def load(): Unit = {
     if (new File(configPath).exists) {
+      logger.info(s"PerfLA-loader: Config path [$configPath].")
       val configInput = new FileInputStream(configPath)
       try {
         val config = yaml.load(configInput).asInstanceOf[ConfigBean]
@@ -51,8 +40,11 @@ object Config {
         setting = newSetting
 
         val tasks = config.tasks
-        if (tasks == null) valid = false
-        else {
+        if (tasks == null) {
+          logger.warn(s"PerfLA-loader: No task is defined in the config file.")
+          valid = false
+          startWatchDaemon()
+        } else {
           val newIdentifierMap = new mutable.HashMap[TaskIdentifier, Task]()
           val newPatternMap = new mutable.HashMap[String, Task]()
           tasks.foreach(taskBean => {
@@ -65,29 +57,48 @@ object Config {
           identifierMap = newIdentifierMap
           patternMap = newPatternMap
           valid = true
+          if (setting.watcherEnable) startWatchDaemon()
+          else stopWatchDaemon()
         }
       } catch {
         case e: Exception =>
-          valid = false
           logger.error("PerfLA-loader: Malformed config file.", e)
+          valid = false
+          startWatchDaemon()
       }
     } else {
-      valid = false
       logger.warn(s"PerfLA-loader: Config file [$configPath] is not available.")
+      valid = false
+      startWatchDaemon()
     }
   }
 
+  def startWatchDaemon(): Unit = if (!hasDaemon) {
+    daemon.stop = false
+    val t = new Thread(daemon)
+    t.setDaemon(true)
+    t.start()
+    hasDaemon = true
+    logger.info("PerfLA-loader: Config watcher started.")
+  }
+
+  def stopWatchDaemon(): Unit = {
+    daemon.stop = true
+    hasDaemon = false
+    logger.info("PerfLA-loader: Config watcher terminated.")
+  }
+
   private class ConfigWatcher extends Runnable {
-    private var stop = false
+    var stop = false
 
     override def run(): Unit = {
-      logger.info("PerfLA-loader: Config watcher started.")
       val watchService = FileSystems.getDefault.newWatchService
       Paths.get(configDirPath).register(watchService,
         StandardWatchEventKinds.ENTRY_MODIFY,
         StandardWatchEventKinds.ENTRY_CREATE)
+      var watchKey: WatchKey = null
       while (!stop) {
-        val watchKey = watchService.take
+        watchKey = watchService.take
         watchKey.pollEvents.asScala.foreach(event => {
           val changed = event.context.asInstanceOf[Path]
           if (changed.endsWith(configFileName)) {
@@ -100,13 +111,7 @@ object Config {
           logger.warn("PerfLA-loader: Watch key has been unregistered.")
         }
       }
-    }
-
-    def reset(): Unit = stop = false
-
-    def terminate(): Unit = {
-      stop = true
-      logger.info("PerfLA-loader: Config watcher terminated.")
+      watchKey.cancel()
     }
   }
 

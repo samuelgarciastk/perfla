@@ -37,10 +37,10 @@ class Threshold {
   }
 }
 
-object Threshold {
-  private val default_percent = 1D
-  private val default_warn = 5D
-  private val default_error = 10D
+private object Threshold {
+  val default_percent = 1D
+  val default_warn = 5D
+  val default_error = 10D
 }
 
 object ThresholdType extends Enumeration {

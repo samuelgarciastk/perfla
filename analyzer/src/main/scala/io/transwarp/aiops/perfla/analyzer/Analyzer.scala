@@ -125,8 +125,11 @@ class Analyzer(files: Array[File]) {
     sqlMap.foreach { case (sql, sqlInfo) =>
       val delimiter = '+' + (-1 to sql.length).map(_ => '-').mkString + '+'
       println(s"\n$delimiter\n| $sql |\n$delimiter\n")
-      sqlInfo.idMap.foreach(_._2.print(""))
-      println(s"\nTotal logging statements: ${sqlInfo.logNum}")
+      sqlInfo.idMap.foreach { case (_, taskNode) =>
+        taskNode.print("")
+        println
+      }
+      println(s"Total logging statements: ${sqlInfo.logNum}")
     }
   }
 }

@@ -21,10 +21,10 @@ class Task {
   }
 }
 
-object Task {
-  private val default_id = "no-id"
+private object Task {
+  val default_id = "no-id"
 
-  private def defaultPattern(taskIdentifier: TaskIdentifier): String = taskIdentifier.className + " " + taskIdentifier.methodName
+  def defaultPattern(taskIdentifier: TaskIdentifier): String = taskIdentifier.className + " " + taskIdentifier.methodName
 }
 
 class TaskIdentifier(val className: String, val methodName: String) {
