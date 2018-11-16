@@ -2,27 +2,39 @@ package io.transwarp.aiops.perfla.loader
 
 import io.transwarp.aiops.perfla.loader.LogMod.LogMod
 
+import scala.collection.mutable
+
 class Task {
   var id: String = _
   var identifier: TaskIdentifier = _
   var pattern: String = _
   var mode: LogMod = _
   var threshold: Threshold = _
-  var subTasks: Array[String] = _
+  var hasSubTasks = false
+  var subTaskIds: mutable.HashSet[String] = _
+  var allSubTaskIds: mutable.HashSet[String] = _
 
   def init(taskIdentifier: TaskIdentifier, taskBean: TaskBean): Unit = {
-    id = Option(taskBean.id).getOrElse(Task.default_id)
+    id = Option(taskBean.id).getOrElse(throw new RuntimeException("PerfLA-loader: Task with undefined task id."))
     identifier = taskIdentifier
     pattern = Option(taskBean.pattern).getOrElse(Task.defaultPattern(taskIdentifier))
     mode = if (taskBean.mode == null) LogMod.DEFAULT else LogMod.withNameWithDefault(taskBean.mode)
     threshold = new Threshold
     threshold.init(taskBean.threshold)
-    subTasks = taskBean.sub_tasks
+    if (taskBean.sub_tasks != null && taskBean.sub_tasks.nonEmpty) {
+      hasSubTasks = true
+      subTaskIds = new mutable.HashSet[String]
+      subTaskIds ++= taskBean.sub_tasks
+    }
   }
+
+  def directContains(taskId: String): Boolean = if (hasSubTasks) subTaskIds.contains(taskId) else false
+
+  def contains(taskId: String): Boolean = if (hasSubTasks) allSubTaskIds.contains(taskId) else false
 }
 
-private object Task {
-  val default_id = "no-id"
+object Task {
+  val root_id = "root"
 
   def defaultPattern(taskIdentifier: TaskIdentifier): String = taskIdentifier.className + " " + taskIdentifier.methodName
 }

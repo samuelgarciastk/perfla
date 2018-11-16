@@ -1,5 +1,7 @@
 ---
 settings:
+  logger_enable: true
+  watcher_enable: true
   prefix: '[PerfLog]'
   # MB/s
   io_read: 300
@@ -9,7 +11,8 @@ settings:
 
 tasks:
   # Default threshold
-  - clazz: 'threshold'
+  - id: threshold
+    clazz: 'threshold'
     method: 'default'
     threshold:
       - &IOR
@@ -42,6 +45,7 @@ tasks:
     pattern: 'WritableAppendOnlySegment load'
     mode: FORCE
     threshold: [*CPU]
+    sub_tasks: [r1]
 
   # RowBlockDS
   - id: r1
@@ -82,7 +86,7 @@ tasks:
     pattern: 'InternalRowIterator iterator'
     mode: FORCE
     threshold: [*IOR]
-    sub_tasks: [rbi1, rbi2, rbi3, rbi4]
+    sub_tasks: [r1, rbi1, rbi2, rbi3, rbi4]
 
   # RowBlock Iterator
   - id: rbi1
@@ -141,19 +145,19 @@ tasks:
     threshold: [*IOR]
 
   # put
-  - id: p2
+  - id: p1
     clazz: 'io.transwarp.holodesk.storage.ds.segment.WritableAppendOnlySegment'
     method: 'close'
     pattern: 'WritableAppendOnlySegment close'
     mode: MUTE
     threshold: [*IOW]
-  - id: p3
+  - id: p2
     clazz: 'io.transwarp.holodesk.storage.ds.column.block.RowBlockDS'
     method: 'spill'
     pattern: 'RowBlock spill'
     mode: MUTE
     threshold: [*IOW]
-  - id: p4
+  - id: p3
     clazz: 'io.transwarp.holodesk.storage.ds.column.block.RowBlockDS'
     method: 'spillMetaData'
     pattern: 'RowBlock spillMetaData'

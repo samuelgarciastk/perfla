@@ -21,7 +21,7 @@ class PerfLogger(clazz: Class[_] = classOf[PerfLogger]) {
 
   def log(checkpoint: Checkpoint): Unit = log(checkpoint, null)
 
-  def log(checkpoint: Checkpoint, logMod: LogMod): Unit = if (Config.isValid) {
+  def log(checkpoint: Checkpoint, logMod: LogMod): Unit = if (Config.isValid && Config.setting.loggerEnable) {
     if (!checkpoint.isValid) checkpoint.stop
     val task = getTask(checkpoint.taskIdentifier)
     if (task != null) {
@@ -38,25 +38,28 @@ class PerfLogger(clazz: Class[_] = classOf[PerfLogger]) {
 
   private def defaultLog(checkpoint: Checkpoint, task: Task): Unit = {
     val dataSize = if (checkpoint.dataSize == 0) 1L else checkpoint.dataSize
-    checkpoint.interval match {
+    val interval = checkpoint.endTime - checkpoint.startTime
+    interval match {
       case i if i > task.threshold.error * dataSize =>
         logger.error(logFormat(
           task.pattern,
+          task.id,
           "ERROR",
           checkpoint.id,
           checkpoint.startTime,
           checkpoint.endTime,
-          checkpoint.interval,
+          interval,
           checkpoint.dataSize,
           1))
       case i if i > task.threshold.warn * dataSize =>
         logger.warn(logFormat(
           task.pattern,
+          task.id,
           "WARN",
           checkpoint.id,
           checkpoint.startTime,
           checkpoint.endTime,
-          checkpoint.interval,
+          interval,
           checkpoint.dataSize,
           1))
       case _ =>
@@ -66,30 +69,26 @@ class PerfLogger(clazz: Class[_] = classOf[PerfLogger]) {
   private def forceLog(checkpoint: Checkpoint, task: Task): Unit = {
     logger.info(logFormat(
       if (task == null) "Unknown Task" else task.pattern,
+      if (task == null) "UnknownId" else task.id,
       "INFO",
       checkpoint.id,
       checkpoint.startTime,
       checkpoint.endTime,
-      checkpoint.interval,
+      checkpoint.endTime - checkpoint.startTime,
       checkpoint.dataSize,
       1))
   }
 
-  def log(collector: Collector): Unit = log(collector, null)
-
-  def log(collector: Collector, logMod: LogMod): Unit = if (Config.isValid && collector.isValid) {
-    val task = getTask(collector.taskIdentifier)
-    if (task != null) {
-      Option(logMod).getOrElse(task.mode) match {
-        case LogMod.DEFAULT => defaultLog(collector, task)
-        case LogMod.FORCE => forceLog(collector, task)
-        case LogMod.MUTE =>
-        case _ => logger.warn("Unknown PerfLA log mod.")
-      }
-    } else if (logMod == LogMod.FORCE) {
-      forceLog(collector, null)
-    }
-  }
+  private def logFormat(pattern: String,
+                        taskId: String,
+                        level: String,
+                        id: String,
+                        startTime: Long,
+                        endTime: Long,
+                        totalTime: Long,
+                        dataSize: Long,
+                        taskNum: Int): String =
+    s"${Config.setting.prefix}|$pattern|$taskId|$level|$id|$startTime|$endTime|$totalTime|$dataSize|$taskNum"
 
   private def getTask(taskIdentifier: TaskIdentifier): Task = {
     if (taskIdentifier != null && Config.isValid) {
@@ -97,12 +96,32 @@ class PerfLogger(clazz: Class[_] = classOf[PerfLogger]) {
     } else null
   }
 
+  def log(collector: Collector): Unit = log(collector, null)
+
+  def log(collector: Collector, logMod: LogMod): Unit =
+    if (Config.isValid
+      && Config.setting.loggerEnable
+      && collector.isValid) {
+      val task = getTask(collector.taskIdentifier)
+      if (task != null) {
+        Option(logMod).getOrElse(task.mode) match {
+          case LogMod.DEFAULT => defaultLog(collector, task)
+          case LogMod.FORCE => forceLog(collector, task)
+          case LogMod.MUTE =>
+          case _ => logger.warn("Unknown PerfLA log mod.")
+        }
+      } else if (logMod == LogMod.FORCE) {
+        forceLog(collector, null)
+      }
+    }
+
   private def defaultLog(collector: Collector, task: Task): Unit = {
     val dataSize = if (collector.dataSize == 0) 1L else collector.dataSize
     collector.totalTime match {
       case t if t > task.threshold.error * dataSize =>
         logger.error(logFormat(
           task.pattern,
+          task.id,
           "ERROR",
           collector.id,
           collector.startTime,
@@ -113,6 +132,7 @@ class PerfLogger(clazz: Class[_] = classOf[PerfLogger]) {
       case t if t > task.threshold.warn * dataSize =>
         logger.warn(logFormat(
           task.pattern,
+          task.id,
           "WARN",
           collector.id,
           collector.startTime,
@@ -124,19 +144,10 @@ class PerfLogger(clazz: Class[_] = classOf[PerfLogger]) {
     }
   }
 
-  private def logFormat(pattern: String,
-                        level: String,
-                        id: String,
-                        startTime: Long,
-                        endTime: Long,
-                        totalTime: Long,
-                        dataSize: Long,
-                        taskNum: Int): String =
-    s"${Config.setting.prefix}|$pattern|$level|$id|$startTime|$endTime|$totalTime|$dataSize|$taskNum"
-
   private def forceLog(collector: Collector, task: Task): Unit = {
     logger.info(logFormat(
       if (task == null) "Unknown Task" else task.pattern,
+      if (task == null) "UnknownId" else task.id,
       "INFO",
       collector.id,
       collector.startTime,

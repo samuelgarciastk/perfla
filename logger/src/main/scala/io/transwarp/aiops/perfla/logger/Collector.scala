@@ -1,6 +1,6 @@
 package io.transwarp.aiops.perfla.logger
 
-import io.transwarp.aiops.perfla.loader.TaskIdentifier
+import io.transwarp.aiops.perfla.loader.{Config, TaskIdentifier}
 
 class Collector {
   private[logger] var id: String = _
@@ -29,19 +29,23 @@ class Collector {
   }
 
   def start: Collector = {
-    currentTime = System.currentTimeMillis
-    if (startTime == -1L) startTime = currentTime
-    currentSize = 0
+    if (Config.setting.loggerEnable) {
+      currentTime = System.currentTimeMillis
+      if (startTime == -1L) startTime = currentTime
+      currentSize = 0
+    }
     this
   }
 
   def stop: Collector = stop(true)
 
   def stop(taskEnd: Boolean): Collector = {
-    endTime = System.currentTimeMillis
-    totalTime += endTime - currentTime
-    dataSize += currentSize
-    if (taskEnd) taskNum += 1
+    if (Config.setting.loggerEnable) {
+      endTime = System.currentTimeMillis
+      totalTime += endTime - currentTime
+      dataSize += currentSize
+      if (taskEnd) taskNum += 1
+    }
     this
   }
 

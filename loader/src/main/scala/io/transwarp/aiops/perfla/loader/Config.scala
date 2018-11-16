@@ -20,7 +20,7 @@ object Config {
   private val daemon = new ConfigWatcher
   var setting: Setting = _
   var identifierMap: mutable.Map[TaskIdentifier, Task] = _
-  var patternMap: mutable.Map[String, Task] = _
+  var taskIdMap: mutable.Map[String, Task] = _
   private var hasDaemon = false
   private var valid = false
 
@@ -28,34 +28,38 @@ object Config {
 
   def isValid: Boolean = valid
 
-  private def load(): Unit = {
+  private def load(): Unit = logger.synchronized {
     if (new File(configPath).exists) {
       logger.info(s"PerfLA-loader: Config path [$configPath].")
       val configInput = new FileInputStream(configPath)
       try {
         val config = yaml.load(configInput).asInstanceOf[ConfigBean]
-
+        // settings
         val newSetting = new Setting
         newSetting.init(config.settings)
         setting = newSetting
-
+        // tasks
         val tasks = config.tasks
         if (tasks == null) {
           logger.warn(s"PerfLA-loader: No task is defined in the config file.")
           valid = false
           startWatchDaemon()
         } else {
-          val newIdentifierMap = new mutable.HashMap[TaskIdentifier, Task]()
-          val newPatternMap = new mutable.HashMap[String, Task]()
+          val newIdentifierMap = new mutable.HashMap[TaskIdentifier, Task]
+          val newTaskIdMap = new mutable.HashMap[String, Task]
+
           tasks.foreach(taskBean => {
             val identifier = new TaskIdentifier(taskBean.clazz, taskBean.method)
             val task = new Task
             task.init(identifier, taskBean)
             newIdentifierMap += identifier -> task
-            newPatternMap += task.pattern -> task
+            newTaskIdMap += task.id -> task
           })
+
           identifierMap = newIdentifierMap
-          patternMap = newPatternMap
+          taskIdMap = newTaskIdMap
+          genTaskRelation()
+
           valid = true
           if (setting.watcherEnable) startWatchDaemon()
           else stopWatchDaemon()
@@ -71,6 +75,31 @@ object Config {
       valid = false
       startWatchDaemon()
     }
+  }
+
+  private def genTaskRelation(): Unit = {
+    val roots = new mutable.HashSet[String]
+    roots ++= taskIdMap.keySet
+
+    def recurse(t: Task): mutable.HashSet[String] = if (t.hasSubTasks) {
+      if (t.allSubTaskIds == null) {
+        t.allSubTaskIds = new mutable.HashSet[String]
+        t.allSubTaskIds ++= t.subTaskIds
+        t.allSubTaskIds ++= t.subTaskIds.map(subTaskId => recurse(taskIdMap(subTaskId))).reduce(_ ++ _)
+      }
+      roots --= t.subTaskIds
+      t.allSubTaskIds
+    } else new mutable.HashSet
+
+    roots.foreach(f => recurse(Config.taskIdMap(f)))
+
+    // Create root task
+    val rootTask = new Task
+    assert(roots.nonEmpty)
+    rootTask.hasSubTasks = true
+    rootTask.subTaskIds = roots
+    rootTask.allSubTaskIds = taskIdMap.keySet.to[mutable.HashSet]
+    taskIdMap += "root" -> rootTask
   }
 
   def startWatchDaemon(): Unit = if (!hasDaemon) {
@@ -96,9 +125,8 @@ object Config {
       Paths.get(configDirPath).register(watchService,
         StandardWatchEventKinds.ENTRY_MODIFY,
         StandardWatchEventKinds.ENTRY_CREATE)
-      var watchKey: WatchKey = null
       while (!stop) {
-        watchKey = watchService.take
+        val watchKey = watchService.take
         watchKey.pollEvents.asScala.foreach(event => {
           val changed = event.context.asInstanceOf[Path]
           if (changed.endsWith(configFileName)) {
@@ -111,7 +139,6 @@ object Config {
           logger.warn("PerfLA-loader: Watch key has been unregistered.")
         }
       }
-      watchKey.cancel()
     }
   }
 

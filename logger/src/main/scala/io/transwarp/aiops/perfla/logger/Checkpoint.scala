@@ -1,6 +1,6 @@
 package io.transwarp.aiops.perfla.logger
 
-import io.transwarp.aiops.perfla.loader.TaskIdentifier
+import io.transwarp.aiops.perfla.loader.{Config, TaskIdentifier}
 
 class Checkpoint {
   private[logger] var id: String = _
@@ -8,7 +8,6 @@ class Checkpoint {
   private[logger] var dataSize: Long = 0L
   private[logger] var startTime: Long = -1L
   private[logger] var endTime: Long = -1L
-  private[logger] var interval: Long = -1L
 
   def setId(value: String): Checkpoint = {
     id = value
@@ -20,38 +19,20 @@ class Checkpoint {
     this
   }
 
-  /**
-    * Set data size.
-    * @param value data size
-    * @return
-    */
   def setSize(value: Long): Checkpoint = {
     dataSize = value
     this
   }
 
-  /**
-    * Start timer.
-    * @return
-    */
   def start: Checkpoint = {
-    startTime = System.currentTimeMillis
+    if (Config.setting.loggerEnable) startTime = System.currentTimeMillis
     this
   }
 
-  /**
-    * Stop timer.
-    * @return
-    */
   def stop: Checkpoint = {
-    endTime = System.currentTimeMillis
-    interval = endTime - startTime
+    if (Config.setting.loggerEnable) endTime = System.currentTimeMillis
     this
   }
 
-  /**
-    * Check whether this checkpoint is ready to be record.
-    * @return
-    */
-  def isValid: Boolean = interval != -1L
+  def isValid: Boolean = startTime != -1L && endTime != -1L
 }
