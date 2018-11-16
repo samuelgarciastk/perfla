@@ -11,7 +11,13 @@ import scala.io.Source
 
 object Analyzer {
   private val logger = LoggerFactory.getLogger(Analyzer.getClass)
-  private val usage = "Usage: perfla [-v] Path"
+  private val usage =
+    """Usage: perfla [<options>] <file or directory path>
+      |
+      |Options:
+      |-v, --verbose  show more information
+      |-h, --human    show human-readable output
+      |    --help     display this help and exit""".stripMargin
   private[analyzer] var verbose = false
   private[analyzer] var humanReadable = false
 
@@ -36,6 +42,7 @@ object Analyzer {
           verbose = true
           humanReadable = true
           parseOption(tail)
+        case "--help" :: _ => exit()
         case option :: _ if option == "" || option.head == '-' => exit()
         case pathStr :: Nil => path = pathStr
         case _ :: _ => exit()

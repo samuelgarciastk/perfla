@@ -1,3 +1,4 @@
+[PerfLog]|RowBlockDS load|r1|INFO|4a5de788-4263-47c6-b419-872a6f37f499|0|1|238|0|1
 [PerfLog]|InternalRowIterator init|s1|INFO|4a5de788-4263-47c6-b419-872a6f37f499|2|20|181|0|1
 [PerfLog]|InternalRowIterator init|s1|INFO|4a5de788-4263-47c6-b419-872a6f37f499|3|40|254|0|1
 [PerfLog]|RowBlockDS load|r1|INFO|4a5de788-4263-47c6-b419-872a6f37f499|5|39|238|0|1

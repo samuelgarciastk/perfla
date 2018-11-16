@@ -25,14 +25,14 @@ private[analyzer] class TaskNode(taskId: String, parentNode: TaskNode) {
     levelCount += TaskLevel.UNKNOWN -> 0
   }
 
-  def merge(taskEntry: TaskEntry): TaskNode = if (isEmpty) {
+  def merge(taskEntry: TaskEntry, fake: Boolean = false): TaskNode = if (isEmpty) {
     startTime = taskEntry.startTime
     endTime = taskEntry.endTime
     time = taskEntry.totalTime
     size = taskEntry.dataSize
     num = taskEntry.taskNum
     levelCount.update(taskEntry.level, 1)
-    isEmpty = false
+    if (!fake) isEmpty = false
     this
   } else {
     if (isEmpty) startTime = taskEntry.startTime
@@ -87,7 +87,7 @@ private[analyzer] class TaskNode(taskId: String, parentNode: TaskNode) {
           if (subTask contains targetId) {
             val newSubTask = new TaskNode(subTaskId, this)
             subTasks += newSubTask
-            newSubTask merge taskEntry
+            newSubTask.merge(taskEntry, fake = true)
             targetNode = newSubTask append taskEntry
             break = true
           }
@@ -107,23 +107,38 @@ private[analyzer] class TaskNode(taskId: String, parentNode: TaskNode) {
     else {
       println(prefix + this)
       // print sub tasks
-      val basePrefix = if (prefix == "") "" else prefix.substring(0, prefix.length - 3) + "|  "
+      val basePrefix = if (prefix == "") ""
+      else prefix.substring(0, prefix.length - 3) +
+        (if (prefix.substring(prefix.length - 3) == "\\- ") "   " else "|  ")
       val taskPrefix = basePrefix + "+- "
       val lastPrefix = basePrefix + "\\- "
       var subTime = 0L
-      subTasks.foreach(task => {
-        subTime += task.time
-        task.print(taskPrefix)
-      })
-      if (subTasks.nonEmpty) println(s"${lastPrefix}Unknown time: ${Utils.formatInterval(time - subTime)}")
+
+      if (isEmpty) {
+        subTasks.init
+        val lastIndex = subTasks.length - 1
+        subTasks.zipWithIndex.foreach { case (subTask, index) =>
+          subTime += subTask.time
+          if (index == lastIndex) subTask.print(lastPrefix)
+          else subTask.print(taskPrefix)
+        }
+      } else {
+        subTasks.foreach(subTask => {
+          subTime += subTask.time
+          subTask.print(taskPrefix)
+        })
+        if (subTasks.nonEmpty) println(s"${lastPrefix}Unknown time: ${Utils.formatInterval(time - subTime)}")
+      }
     }
   }
 
   override def toString: String = {
-    val sb = new StringBuilder(task.pattern)
-    if (isEmpty) sb.append(" [EMPTY]")
+    val sb = new StringBuilder
+    if (isEmpty) sb.append("[EMPTY] ").append(task.pattern)
     else {
-      sb.append(": ").append(Utils.formatInterval(time))
+      sb.append(task.pattern)
+        .append(": ")
+        .append(Utils.formatInterval(time))
 
       if (Analyzer.verbose)
         sb.append(" [")
@@ -136,7 +151,9 @@ private[analyzer] class TaskNode(taskId: String, parentNode: TaskNode) {
         sb.append(", ")
           .append(Utils.formatByte(size))
 
-      sb.append(", ").append(num).append(" tasks")
+      sb.append(", ")
+        .append(num)
+        .append(" tasks")
 
       if (Analyzer.verbose) {
         sb.append(", [")
