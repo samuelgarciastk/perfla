@@ -83,7 +83,7 @@ private[analyzer] class Analyzer(files: Array[File]) {
     val source = Source.fromFile(file)
     val lines = source.getLines
 
-    lines.foreach(line => if (line.indexOf(Config.setting.prefix) != -1) {
+    lines.foreach(line => if (line contains Config.setting.prefix) {
       val taskEntry = new TaskEntry(line)
       if (Config.taskIdMap.contains(taskEntry.taskId)) {
         if (taskMap.contains(taskEntry.id)) {

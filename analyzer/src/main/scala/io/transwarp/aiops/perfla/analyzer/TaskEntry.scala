@@ -3,7 +3,7 @@ package io.transwarp.aiops.perfla.analyzer
 import io.transwarp.aiops.perfla.analyzer.TaskLevel.TaskLevel
 import io.transwarp.aiops.perfla.loader.Config
 
-private[analyzer] class TaskEntry(line: String) {
+private[analyzer] class TaskEntry(val line: String) {
   var taskId: String = _
   var level: TaskLevel = _
   var id: String = _

@@ -25,24 +25,16 @@ private[analyzer] class TaskNode(taskId: String, parentNode: TaskNode) {
     levelCount += TaskLevel.UNKNOWN -> 0
   }
 
-  def merge(taskEntry: TaskEntry, fake: Boolean = false): TaskNode = if (isEmpty) {
-    startTime = taskEntry.startTime
-    endTime = taskEntry.endTime
-    time = taskEntry.totalTime
-    size = taskEntry.dataSize
-    num = taskEntry.taskNum
-    levelCount.update(taskEntry.level, 1)
-    if (!fake) isEmpty = false
-    this
-  } else {
-    if (isEmpty) startTime = taskEntry.startTime
+  def merge(taskEntry: TaskEntry, fake: Boolean = false): TaskNode = if (!fake) {
+    if (startTime == -1L) startTime = taskEntry.startTime
     if (endTime < taskEntry.endTime) endTime = taskEntry.endTime
     time += taskEntry.totalTime
     size += taskEntry.dataSize
     num += taskEntry.taskNum
     levelCount.update(taskEntry.level, levelCount(taskEntry.level) + 1)
+    isEmpty = false
     this
-  }
+  } else this
 
   def append(taskEntry: TaskEntry): TaskNode = {
     val targetId = taskEntry.taskId
@@ -164,13 +156,17 @@ private[analyzer] class TaskNode(taskId: String, parentNode: TaskNode) {
     sb.toString
   }
 
-  def canAppend(taskEntry: TaskEntry): Boolean = if (isRoot) true else task.hasSubTasks &&
-    startTime <= taskEntry.startTime && taskEntry.endTime <= endTime &&
-    task.allSubTaskIds.contains(taskEntry.taskId)
+  def canAppend(taskEntry: TaskEntry): Boolean = isRoot ||
+    (task contains taskEntry.taskId)
+
+  //    ((task contains taskEntry.taskId) &&
+  //      (isEmpty ||
+  //        (startTime <= taskEntry.startTime &&
+  //          taskEntry.endTime <= endTime)))
 
   def getParent: TaskNode = parentNode
 
   private def isRoot: Boolean = taskId == Task.root_id
 
-  private def canMerge(taskEntry: TaskEntry): Boolean = taskEntry.taskId == taskId && taskEntry.startTime <= endTime
+  private def canMerge(taskEntry: TaskEntry): Boolean = taskEntry.taskId == taskId //&& taskEntry.startTime <= endTime
 }

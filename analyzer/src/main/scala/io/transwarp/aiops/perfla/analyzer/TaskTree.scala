@@ -9,7 +9,7 @@ private[analyzer] class TaskTree {
 
   def append(taskEntry: TaskEntry): Unit = {
     logNum += 1
-    while (!currentNode.canAppend(taskEntry)) {
+    while (!(currentNode canAppend taskEntry)) {
       currentNode = currentNode.getParent
     }
     currentNode = currentNode.append(taskEntry)
