@@ -12,7 +12,7 @@ private[analyzer] object Utils {
     files.filter(_.isFile) ++ files.filter(_.isDirectory).flatMap(listFiles)
   }
 
-  def formatInterval(t: Long): String = if (Analyzer.humanReadable) {
+  def formatInterval(t: Long): String = if (Analyzer.config.humanReadable) {
     var sec = t / 1000
     if (sec == 0) return s"${t}ms"
     val millis = t % 1000
@@ -25,7 +25,7 @@ private[analyzer] object Utils {
     s"${hour}h ${min}m ${sec}s ${millis}ms"
   } else s"${t}ms"
 
-  def formatByte(b: Long): String = if (Analyzer.humanReadable) {
+  def formatByte(b: Long): String = if (Analyzer.config.humanReadable) {
     val unit = 1024
     if (b < unit) s"$b B"
     else {
@@ -36,5 +36,5 @@ private[analyzer] object Utils {
     }
   } else s"$b B"
 
-  def formatTime(t: Long): String = if (Analyzer.humanReadable) sdf.format(new Date(t)) else t.toString
+  def formatTime(t: Long): String = if (Analyzer.config.humanReadable) sdf.format(new Date(t)) else t.toString
 }

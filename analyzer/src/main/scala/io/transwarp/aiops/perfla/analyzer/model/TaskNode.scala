@@ -1,6 +1,7 @@
-package io.transwarp.aiops.perfla.analyzer
+package io.transwarp.aiops.perfla.analyzer.model
 
-import io.transwarp.aiops.perfla.analyzer.TaskLevel.TaskLevel
+import io.transwarp.aiops.perfla.analyzer.model.TaskLevel.TaskLevel
+import io.transwarp.aiops.perfla.analyzer.{Analyzer, Utils}
 import io.transwarp.aiops.perfla.loader.{Config, Task}
 
 import scala.collection.mutable
@@ -132,7 +133,7 @@ private[analyzer] class TaskNode(taskId: String, parentNode: TaskNode) {
         .append(": ")
         .append(Utils.formatInterval(time))
 
-      if (Analyzer.verbose)
+      if (Analyzer.config.verbose)
         sb.append(" [")
           .append(Utils.formatTime(startTime))
           .append(" ~ ")
@@ -147,7 +148,7 @@ private[analyzer] class TaskNode(taskId: String, parentNode: TaskNode) {
         .append(num)
         .append(" tasks")
 
-      if (Analyzer.verbose) {
+      if (Analyzer.config.verbose) {
         sb.append(", [")
           .append(levelCount.filter(_._2 > 0).map { case (level, count) => s"$level: $count" }.mkString(", "))
           .append("]")

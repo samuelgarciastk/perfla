@@ -28,8 +28,8 @@ tasks:
       - &CPU
         typ: CPU
         percent: 1
-        warn: 5
-        error: 10
+        warn: 500000
+        error: 1000000
 
   - id: s1
     clazz: 'io.transwarp.holodesk.storage.ds.segment.Segment.InternalRowIterator'
@@ -59,25 +59,25 @@ tasks:
     clazz: 'io.transwarp.holodesk.storage.ds.column.block.RowBlockDS'
     method: 'loadFilterBuffer'
     pattern: 'RowBlockDS loadFilterBuffer'
-    mode: FORCE
+    # mode: FORCE
     threshold: [*IOR]
   - id: r3
     clazz: 'io.transwarp.holodesk.storage.ds.column.block.RowBlockDS'
     method: 'blockIsPassedByFilter'
     pattern: 'RowBlockDS blockIsPassedByFilter'
-    mode: FORCE
+    # mode: FORCE
     threshold: [*CPU]
   - id: r4
     clazz: 'io.transwarp.holodesk.storage.ds.column.block.RowBlockDS'
     method: 'loadColumnBlocks'
     pattern: 'RowBlockDS loadColumnBlocks'
-    mode: FORCE
+    # mode: FORCE
     threshold: [*CPU]
   - id: r5
     clazz: 'io.transwarp.holodesk.storage.ds.column.block.RowBlockDS'
     method: 'getBlockBitSet'
     pattern: 'RowBlockDS getBlockBitSet'
-    mode: FORCE
+    # mode: FORCE
     threshold: [*IOR]
 
   - id: si1
@@ -123,43 +123,40 @@ tasks:
     clazz: 'io.transwarp.holodesk.storage.ds.column.block.HashDictionaryColumnBlockDS'
     method: 'get'
     pattern: 'HashDictionaryColumnBlockDS get'
-    mode: FORCE
+    # mode: FORCE
     threshold: [*IOR]
   - id: cb2
     clazz: 'io.transwarp.holodesk.storage.ds.column.block.HashDictionaryColumnBlockDS'
     method: 'getBatch'
     pattern: 'HashDictionaryColumnBlockDS getBatch'
-    mode: FORCE
+    # mode: FORCE
     threshold: [*IOR]
   - id: cb3
     clazz: 'io.transwarp.holodesk.storage.ds.column.block.RadixTrieColumnBlockDS'
     method: 'get'
     pattern: 'RadixTrieColumnBlockDS get'
-    mode: FORCE
+    # mode: FORCE
     threshold: [*IOR]
   - id: cb4
     clazz: 'io.transwarp.holodesk.storage.ds.column.block.RadixTrieColumnBlockDS'
     method: 'getBatch'
     pattern: 'RadixTrieColumnBlockDS getBatch'
-    mode: FORCE
+    # mode: FORCE
     threshold: [*IOR]
 
   # put
-  - id: p1
-    clazz: 'io.transwarp.holodesk.storage.ds.segment.WritableAppendOnlySegment'
-    method: 'close'
-    pattern: 'WritableAppendOnlySegment close'
-    mode: MUTE
-    threshold: [*IOW]
-  - id: p2
-    clazz: 'io.transwarp.holodesk.storage.ds.column.block.RowBlockDS'
-    method: 'spill'
-    pattern: 'RowBlock spill'
-    mode: MUTE
-    threshold: [*IOW]
-  - id: p3
-    clazz: 'io.transwarp.holodesk.storage.ds.column.block.RowBlockDS'
-    method: 'spillMetaData'
-    pattern: 'RowBlock spillMetaData'
-    mode: MUTE
-    threshold: [*IOW]
+  # - id: p1
+  #   clazz: 'io.transwarp.holodesk.storage.ds.segment.WritableAppendOnlySegment'
+  #   method: 'close'
+  #   pattern: 'WritableAppendOnlySegment close'
+  #   threshold: [*IOW]
+  # - id: p2
+  #   clazz: 'io.transwarp.holodesk.storage.ds.column.block.RowBlockDS'
+  #   method: 'spill'
+  #   pattern: 'RowBlock spill'
+  #   threshold: [*IOW]
+  # - id: p3
+  #   clazz: 'io.transwarp.holodesk.storage.ds.column.block.RowBlockDS'
+  #   method: 'spillMetaData'
+  #   pattern: 'RowBlock spillMetaData'
+  #   threshold: [*IOW]
