@@ -6,12 +6,12 @@ import org.junit.jupiter.api.{BeforeEach, Test}
 class PerfLoggerTests {
   private var PLOG: PerfLogger = _
 
-  private var collector: Collector = _
+  private var checkpoint: PerfCheckpoint = _
 
   @BeforeEach
   def init(): Unit = {
     PLOG = PerfLogger.getLogger
-    collector = PLOG.collector("PerfLoggerTests", "fakeMethod")
+    checkpoint = PLOG.checkpoint("PerfLoggerTests", "fakeMethod")
   }
 
   @Test
@@ -34,22 +34,19 @@ class PerfLoggerTests {
     fakeMethod()
   }
 
+  private def fakeMethod(): Unit = {
+    checkpoint.start()
+    Thread.sleep(1000)
+    checkpoint.setSize(100)
+    checkpoint.stop()
+  }
+
   @Test
   def finiteLoop(): Unit = {
     for (_ <- 1 to 20) {
       println(Config.isValid)
       fakeMethod()
     }
-    PLOG.log(collector, LogMod.FORCE)
-  }
-
-  private def fakeMethod(): Unit = {
-    val checkpoint = PLOG.checkpoint(null).start
-    collector.start
-    Thread.sleep(1000)
-    checkpoint.setSize(100)
-    collector.setSize(100)
     PLOG.log(checkpoint, LogMod.FORCE)
-    collector.stop
   }
 }

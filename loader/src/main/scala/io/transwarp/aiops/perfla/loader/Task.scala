@@ -57,3 +57,10 @@ object LogMod extends Enumeration {
 
   def withNameWithDefault(name: String): Value = values.find(_.toString == name).getOrElse(UNKNOWN)
 }
+
+object TaskLevel extends Enumeration {
+  type TaskLevel = Value
+  val UNKNOWN, INFO, WARN, ERROR = Value
+
+  def withNameWithDefault(name: String): Value = values.find(_.toString == name).getOrElse(UNKNOWN)
+}

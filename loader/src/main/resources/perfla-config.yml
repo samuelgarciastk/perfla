@@ -117,6 +117,20 @@ tasks:
     mode: FORCE
     threshold: [*IOR]
     sub_tasks: [cb1, cb2, cb3, cb4]
+  - id: rbi5
+    clazz: 'io.transwarp.holodesk.storage.ds.column.block.GlobalIndexGroupByIterator'
+    method: 'iterator'
+    pattern: 'GlobalIndexGroupByIterator iterator'
+    mode: FORCE
+    threshold: [*IOR]
+    sub_tasks: [rbi3, rbi4]
+  - id: rbi6
+    clazz: 'io.transwarp.holodesk.storage.ds.column.block.RowBlockDSFilterIterator'
+    method: 'iterator'
+    pattern: 'RowBlockDSFilterIterator iterator'
+    mode: FORCE
+    threshold: [*IOR]
+    sub_tasks: [rbi3]
 
   # ColumnBlockDS
   - id: cb1

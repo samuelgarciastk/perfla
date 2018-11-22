@@ -1,7 +1,7 @@
 package io.transwarp.aiops.perfla.analyzer.model
 
-import io.transwarp.aiops.perfla.analyzer.model.TaskLevel.TaskLevel
-import io.transwarp.aiops.perfla.loader.Config
+import io.transwarp.aiops.perfla.loader.TaskLevel.TaskLevel
+import io.transwarp.aiops.perfla.loader.{Config, TaskLevel}
 
 private[analyzer] class TaskEntry(val line: String) {
   var taskId: String = _
@@ -29,11 +29,4 @@ private[analyzer] class TaskEntry(val line: String) {
       taskNum = elements(9).toInt
     }
   }
-}
-
-private[analyzer] object TaskLevel extends Enumeration {
-  type TaskLevel = Value
-  val UNKNOWN, INFO, WARN, ERROR = Value
-
-  def withNameWithDefault(name: String): Value = values.find(_.toString == name).getOrElse(UNKNOWN)
 }

@@ -1,8 +1,8 @@
 package io.transwarp.aiops.perfla.analyzer.model
 
-import io.transwarp.aiops.perfla.analyzer.model.TaskLevel.TaskLevel
 import io.transwarp.aiops.perfla.analyzer.{Analyzer, Utils}
-import io.transwarp.aiops.perfla.loader.{Config, Task}
+import io.transwarp.aiops.perfla.loader.TaskLevel.TaskLevel
+import io.transwarp.aiops.perfla.loader.{Config, Task, TaskLevel}
 
 import scala.collection.mutable
 import scala.collection.mutable.ArrayBuffer
