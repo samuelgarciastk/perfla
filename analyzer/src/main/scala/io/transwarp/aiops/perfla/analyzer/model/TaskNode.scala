@@ -105,25 +105,24 @@ private[analyzer] class TaskNode(taskId: String, parentNode: TaskNode) {
         (if (prefix.substring(prefix.length - 3) == "\\- ") "   " else "|  ")
       val taskPrefix = basePrefix + "+- "
       val lastPrefix = basePrefix + "\\- "
-      var subTime = 0L
 
       if (isEmpty) {
         subTasks.init
         val lastIndex = subTasks.length - 1
         subTasks.zipWithIndex.foreach { case (subTask, index) =>
-          subTime += subTask.time
           if (index == lastIndex) subTask.print(lastPrefix)
           else subTask.print(taskPrefix)
         }
       } else {
+        var unknownTime = 0L
+        var lastTime = startTime
         subTasks.foreach(subTask => {
-          subTime += subTask.time
+          if (lastTime < subTask.startTime) unknownTime += subTask.startTime - lastTime
+          lastTime = subTask.endTime
           subTask.print(taskPrefix)
         })
-        if (subTasks.nonEmpty) {
-          val dur = (endTime - startTime + 1) * 1000000 - 1
-          println(s"${lastPrefix}Unknown time: ${Utils.formatInterval(dur - subTime)}")
-        }
+        if (lastTime < endTime) unknownTime += endTime - lastTime
+        if (subTasks.nonEmpty) println(s"${lastPrefix}Unknown time: ${Utils.formatInterval(unknownTime, "ms")}")
       }
     }
   }
@@ -134,7 +133,7 @@ private[analyzer] class TaskNode(taskId: String, parentNode: TaskNode) {
     else {
       sb.append(task.pattern)
         .append(": ")
-        .append(Utils.formatInterval(time))
+        .append(Utils.formatInterval(time, "ns"))
 
       if (Analyzer.config.verbose)
         sb.append(" [")
