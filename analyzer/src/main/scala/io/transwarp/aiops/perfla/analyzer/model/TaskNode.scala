@@ -120,7 +120,10 @@ private[analyzer] class TaskNode(taskId: String, parentNode: TaskNode) {
           subTime += subTask.time
           subTask.print(taskPrefix)
         })
-        if (subTasks.nonEmpty) println(s"${lastPrefix}Unknown time: ${Utils.formatInterval(time - subTime)}")
+        if (subTasks.nonEmpty) {
+          val dur = (endTime - startTime + 1) * 1000000 - 1
+          println(s"${lastPrefix}Unknown time: ${Utils.formatInterval(dur - subTime)}")
+        }
       }
     }
   }

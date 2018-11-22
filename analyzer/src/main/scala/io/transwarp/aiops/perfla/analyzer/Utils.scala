@@ -12,7 +12,7 @@ private[analyzer] object Utils {
     files.filter(_.isFile) ++ files.filter(_.isDirectory).flatMap(listFiles)
   }
 
-  def formatInterval(t: Long): String = if (Analyzer.config.humanReadable) {
+  def formatIntervalMillis(t: Long): String = if (Analyzer.config.humanReadable) {
     var sec = t / 1000
     if (sec == 0) return s"${t}ms"
     val millis = t % 1000
@@ -24,6 +24,26 @@ private[analyzer] object Utils {
     min = min % 60
     s"${hour}h ${min}m ${sec}s ${millis}ms"
   } else s"${t}ms"
+
+  def formatInterval(t: Long): String = if (Analyzer.config.humanReadable) {
+    var millis = t / 1000000
+    if (millis == 0) return s"${t}ns"
+
+    val nanos = t % 1000
+    var sec = millis / 1000
+    if (sec == 0) return s"${millis}ms ${nanos}ns"
+
+    millis = t % 1000
+    var min = sec / 60
+    if (min == 0) return s"${sec}s ${millis}ms ${nanos}ns"
+
+    sec = sec % 60
+    val hour = min / 60
+    if (hour == 0) return s"${min}m ${sec}s ${millis}ms ${nanos}ns"
+
+    min = min % 60
+    s"${hour}h ${min}m ${sec}s ${millis}ms ${nanos}ns"
+  } else s"${t}ns"
 
   def formatByte(b: Long): String = if (Analyzer.config.humanReadable) {
     val unit = 1024

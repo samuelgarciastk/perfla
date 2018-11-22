@@ -25,7 +25,7 @@ class PerfCheckpoint {
   def start: PerfCheckpoint = {
     if (Config.setting.loggerEnable) {
       currentTime = System.nanoTime
-      if (startTime == -1L) startTime = currentTime
+      if (startTime == -1L) startTime = System.currentTimeMillis
     }
     this
   }
@@ -34,8 +34,8 @@ class PerfCheckpoint {
 
   def stop(isTaskStop: Boolean): PerfCheckpoint = {
     if (Config.setting.loggerEnable) {
-      endTime = System.nanoTime
-      totalTime += endTime - currentTime
+      endTime = System.currentTimeMillis
+      totalTime += System.nanoTime - currentTime
       if (isTaskStop) taskCount += 1
     }
     this

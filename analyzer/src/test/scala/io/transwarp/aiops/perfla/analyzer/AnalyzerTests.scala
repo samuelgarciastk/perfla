@@ -13,8 +13,8 @@ class AnalyzerTests {
   @Test
   def analyze(): Unit = {
     //Analyzer.main(Array("-vh", "/home/stk/Projects/PerfLA/loader/src/test/resources/bs5_test.log"))
-    Analyzer.main(Array("-v", "/home/stk/Projects/PerfLA/loader/src/test/resources/fake_test.log"))
-    //Analyzer.main(Array("-vh", "/home/stk/Documents/perfla-test/bs5/f"))
+    //Analyzer.main(Array("-v", "/home/stk/Projects/PerfLA/loader/src/test/resources/fake_test.log"))
+    Analyzer.main(Array("-vh", "/home/stk/Documents/perfla-test/bs5"))
   }
 
   @Test
