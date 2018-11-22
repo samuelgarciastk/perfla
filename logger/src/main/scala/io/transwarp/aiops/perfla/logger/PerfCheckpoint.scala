@@ -22,17 +22,23 @@ class PerfCheckpoint {
     this
   }
 
-  def start(): Unit = if (Config.setting.loggerEnable) {
-    currentTime = System.nanoTime
-    if (startTime == -1L) startTime = currentTime
+  def start: PerfCheckpoint = {
+    if (Config.setting.loggerEnable) {
+      currentTime = System.nanoTime
+      if (startTime == -1L) startTime = currentTime
+    }
+    this
   }
 
-  def stop(): Unit = stop(true)
+  def stop: PerfCheckpoint = stop(true)
 
-  def stop(isTaskStop: Boolean): Unit = if (Config.setting.loggerEnable) {
-    endTime = System.nanoTime
-    totalTime += endTime - currentTime
-    if (isTaskStop) taskCount += 1
+  def stop(isTaskStop: Boolean): PerfCheckpoint = {
+    if (Config.setting.loggerEnable) {
+      endTime = System.nanoTime
+      totalTime += endTime - currentTime
+      if (isTaskStop) taskCount += 1
+    }
+    this
   }
 
   def setSize(value: Long): PerfCheckpoint = {
