@@ -35,10 +35,10 @@ class PerfLoggerTests {
   }
 
   private def fakeMethod(): Unit = {
-    checkpoint.start()
+    checkpoint.start
     Thread.sleep(1000)
     checkpoint.setSize(100)
-    checkpoint.stop()
+    checkpoint.stop
   }
 
   @Test
