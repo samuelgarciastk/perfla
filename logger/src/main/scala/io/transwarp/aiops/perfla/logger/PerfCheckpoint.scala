@@ -5,12 +5,22 @@ import io.transwarp.aiops.perfla.loader.{Config, TaskIdentifier}
 class PerfCheckpoint {
   private[logger] var id: String = _
   private[logger] var taskIdentifier: TaskIdentifier = _
-  private[logger] var startTime: Long = -1L
-  private[logger] var endTime: Long = -1L
-  private[logger] var totalTime: Long = 0L
-  private[logger] var dataSize: Long = 0L
-  private[logger] var taskCount: Int = 0
+  private[logger] var startTime: Long = _
+  private[logger] var endTime: Long = _
+  private[logger] var totalTime: Long = _
+  private[logger] var dataSize: Long = _
+  private[logger] var taskCount: Int = _
   private var currentTime: Long = _
+
+  reset()
+
+  def reset(): Unit = {
+    startTime = -1L
+    endTime = -1L
+    totalTime = 0L
+    dataSize = 0L
+    taskCount = 0
+  }
 
   def setId(value: String): PerfCheckpoint = {
     id = value

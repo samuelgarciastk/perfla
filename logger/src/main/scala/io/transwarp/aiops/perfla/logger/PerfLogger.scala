@@ -34,6 +34,7 @@ class PerfLogger(clazz: Class[_] = classOf[PerfLogger]) {
       } else if (logMod == LogMod.FORCE) {
         forceLog(checkpoint)
       }
+      checkpoint.reset()
     }
 
   private def defaultLog(checkpoint: PerfCheckpoint, task: Task): Unit = {
