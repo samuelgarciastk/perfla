@@ -2,15 +2,16 @@ package io.transwarp.aiops.perfla.loader
 
 import io.transwarp.aiops.perfla.loader.ThresholdType.ThresholdType
 
-class Threshold {
+class Threshold(thresholds: Array[ThresholdBean]) {
   var warn: Double = _
   var error: Double = _
 
-  def init(thresholds: Array[ThresholdBean]): Unit = {
-    if (thresholds == null || thresholds.length == 0) {
-      warn = 0
-      error = 0
-    } else {
+  load()
+
+  def load(): Unit = {
+    warn = 0
+    error = 0
+    if (thresholds != null && thresholds.length != 0) {
       thresholds.foreach(threshold => {
         normalize(threshold) match {
           case ThresholdType.IO_R =>

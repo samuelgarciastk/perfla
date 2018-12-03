@@ -10,10 +10,13 @@ private[loader] class ConfigBean {
 private[loader] class SettingBean {
   @BeanProperty var logger_enable: Boolean = _
   @BeanProperty var watcher_enable: Boolean = _
+  @BeanProperty var root_pwd: String = _
   @BeanProperty var prefix: String = _
+  @BeanProperty var monitor_interval: Int = -1
   @BeanProperty var io_read: Double = -1
   @BeanProperty var io_write: Double = -1
   @BeanProperty var cpu: Double = -1
+  @BeanProperty var cpu_idle: Double = -1
 }
 
 private[loader] class TaskBean {

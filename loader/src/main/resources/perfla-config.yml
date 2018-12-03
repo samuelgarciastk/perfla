@@ -2,12 +2,15 @@
 settings:
   logger_enable: true
   watcher_enable: true
+  root_pwd: '232025'
   prefix: '[PerfLog]'
+  monitor_interval: 3600000
   # MB/s
   io_read: 300
   io_write: 10
   # GHz
   cpu: 2.5
+  cpu_idle: 100
 
 tasks:
   # Default threshold

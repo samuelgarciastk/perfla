@@ -3,6 +3,7 @@ package io.transwarp.aiops.perfla.loader
 import java.io.{File, FileInputStream}
 import java.nio.file._
 
+import io.transwarp.aiops.perfla.loader.monitor.SysMonitor
 import org.slf4j.LoggerFactory
 import org.yaml.snakeyaml.Yaml
 import org.yaml.snakeyaml.constructor.Constructor
@@ -102,17 +103,21 @@ object Config {
     taskIdMap += "root" -> rootTask
   }
 
-  def startWatchDaemon(): Unit = if (!hasDaemon) {
-    daemon.stop = false
-    val t = new Thread(daemon)
-    t.setDaemon(true)
-    t.start()
-    hasDaemon = true
-    logger.info("PerfLA-loader: Config watcher started.")
+  def startWatchDaemon(): Unit = {
+    SysMonitor.start()
+    if (!hasDaemon) {
+      daemon.stop = false
+      val t = new Thread(daemon)
+      t.setDaemon(true)
+      t.start()
+      hasDaemon = true
+      logger.info("PerfLA-loader: Config watcher started.")
+    }
   }
 
   def stopWatchDaemon(): Unit = {
     daemon.stop = true
+    SysMonitor.stop()
     hasDaemon = false
     logger.info("PerfLA-loader: Config watcher terminated.")
   }

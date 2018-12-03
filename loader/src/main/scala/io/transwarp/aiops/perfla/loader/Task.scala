@@ -19,8 +19,7 @@ class Task {
     identifier = taskIdentifier
     pattern = Option(taskBean.pattern).getOrElse(Task.defaultPattern(taskIdentifier))
     mode = if (taskBean.mode == null) LogMod.DEFAULT else LogMod.withNameWithDefault(taskBean.mode)
-    threshold = new Threshold
-    threshold.init(taskBean.threshold)
+    threshold = new Threshold(taskBean.threshold)
     if (taskBean.sub_tasks != null && taskBean.sub_tasks.nonEmpty) {
       hasSubTasks = true
       subTaskIds = new mutable.HashSet[String]
