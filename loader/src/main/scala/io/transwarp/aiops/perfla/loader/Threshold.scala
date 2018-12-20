@@ -24,6 +24,8 @@ class Threshold(thresholds: Array[ThresholdBean]) {
             warn += threshold.warn / Config.setting.cpu / Config.setting.cpu_idle * threshold.percent
             error += threshold.error / Config.setting.cpu / Config.setting.cpu_idle * threshold.percent
           case ThresholdType.MEM =>
+            warn += threshold.warn / Config.setting.mem * threshold.percent
+            error += threshold.error / Config.setting.mem * threshold.percent
           case _ =>
         }
       })

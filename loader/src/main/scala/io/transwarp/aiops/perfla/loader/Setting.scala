@@ -10,6 +10,7 @@ class Setting {
   var io_write: Double = _
   var cpu: Double = _
   var cpu_idle: Double = _
+  var mem: Double = _
 
   private[loader] def init(settingBean: SettingBean): Unit = {
     if (settingBean == null) {
@@ -22,6 +23,7 @@ class Setting {
       io_write = Setting.default_io_write * Setting.io_factor
       cpu = Setting.default_cpu * Setting.cpu_factor
       cpu_idle = Setting.default_cpu_idle
+      mem = Setting.default_mem
     } else {
       loggerEnable = Option(settingBean.logger_enable).getOrElse(Setting.default_logger_enable)
       watcherEnable = Option(settingBean.watcher_enable).getOrElse(Setting.default_watcher_enable)
@@ -37,6 +39,7 @@ class Setting {
       else settingBean.cpu * Setting.cpu_factor
       cpu_idle = if (settingBean.cpu_idle == -1) Setting.default_cpu_idle
       else settingBean.cpu_idle
+      mem = Setting.default_mem
     }
   }
 }
@@ -51,6 +54,7 @@ private object Setting {
   val default_io_write = 30D
   val default_cpu = 2D
   val default_cpu_idle = 100D
+  val default_mem = 1000D
   val io_factor = 1000
   val cpu_factor = 1000000
 }
