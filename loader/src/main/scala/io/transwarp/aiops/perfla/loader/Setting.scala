@@ -56,5 +56,5 @@ private object Setting {
   val default_cpu_idle = 100D
   val default_mem = 1000D
   val io_factor = 1000
-  val cpu_factor = 1000000
+  val cpu_factor = 1
 }

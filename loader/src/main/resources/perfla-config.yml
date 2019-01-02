@@ -2,15 +2,18 @@
 settings:
   logger_enable: true
   watcher_enable: true
-  root_pwd: '232025'
+  root_pwd: ''
   prefix: '[PerfLog]'
   monitor_interval: 3600000
   # MB/s
-  io_read: 300
-  io_write: 10
+  # io_read: 165
+  io_read: 387
+  # io_write: 132
+  io_write: 300
   # GHz
-  cpu: 2.5
-  cpu_idle: 100
+  # cpu: 2.6
+  cpu: 2.3
+  cpu_idle: 93
 
 tasks:
   # Default threshold
@@ -21,8 +24,8 @@ tasks:
       - &IOR
         typ: IO_R
         percent: 1
-        warn: 500
-        error: 1000
+        warn: 30000
+        error: 100000
       - &IOW
         typ: IO_W
         percent: 1
@@ -31,14 +34,14 @@ tasks:
       - &CPU
         typ: CPU
         percent: 1
-        warn: 500000
-        error: 1000000
+        warn: 10000000
+        error: 50000000
 
   - id: s1
     clazz: 'io.transwarp.holodesk.storage.ds.segment.Segment.InternalRowIterator'
     method: 'init'
     pattern: 'InternalRowIterator init'
-    mode: FORCE
+    mode: MUTE
     threshold: [*CPU]
     sub_tasks: [ws1]
 
@@ -46,7 +49,7 @@ tasks:
     clazz: 'io.transwarp.holodesk.storage.ds.segment.WritableAppendOnlySegment'
     method: 'load'
     pattern: 'WritableAppendOnlySegment load'
-    mode: FORCE
+    mode: MUTE
     threshold: [*CPU]
     sub_tasks: [r1]
 
@@ -55,7 +58,7 @@ tasks:
     clazz: 'io.transwarp.holodesk.storage.ds.column.block.RowBlockDS'
     method: 'load'
     pattern: 'RowBlockDS load'
-    mode: FORCE
+    mode: MUTE
     threshold: [*IOR]
     sub_tasks: [r2, r3, r4]
   - id: r2
@@ -63,24 +66,28 @@ tasks:
     method: 'loadFilterBuffer'
     pattern: 'RowBlockDS loadFilterBuffer'
     # mode: FORCE
+    mode: MUTE
     threshold: [*IOR]
   - id: r3
     clazz: 'io.transwarp.holodesk.storage.ds.column.block.RowBlockDS'
     method: 'blockIsPassedByFilter'
     pattern: 'RowBlockDS blockIsPassedByFilter'
     # mode: FORCE
+    mode: MUTE
     threshold: [*CPU]
   - id: r4
     clazz: 'io.transwarp.holodesk.storage.ds.column.block.RowBlockDS'
     method: 'loadColumnBlocks'
     pattern: 'RowBlockDS loadColumnBlocks'
     # mode: FORCE
+    mode: MUTE
     threshold: [*CPU]
   - id: r5
     clazz: 'io.transwarp.holodesk.storage.ds.column.block.RowBlockDS'
     method: 'getBlockBitSet'
     pattern: 'RowBlockDS getBlockBitSet'
     # mode: FORCE
+    mode: MUTE
     threshold: [*IOR]
 
   - id: si1

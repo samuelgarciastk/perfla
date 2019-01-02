@@ -85,7 +85,7 @@ class PerfLogger(clazz: Class[_] = classOf[PerfLogger]) {
       checkpoint.id,
       checkpoint.startTime,
       checkpoint.endTime,
-      checkpoint.endTime - checkpoint.startTime,
+      checkpoint.totalTime,
       checkpoint.dataSize,
       checkpoint.taskCount))
   }
