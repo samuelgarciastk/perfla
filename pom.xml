@@ -126,12 +126,4 @@
         </plugins>
     </build>
 
-    <distributionManagement>
-        <repository>
-            <id>transwarp-snapshots</id>
-            <name>libs-snapshot-local</name>
-            <url>http://172.16.1.168:8081/artifactory/libs-snapshot-local</url>
-        </repository>
-    </distributionManagement>
-
 </project>
